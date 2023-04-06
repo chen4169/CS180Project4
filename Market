@@ -1,0 +1,103 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+
+public class Market {
+    public static void main(String[] args) {
+        int viewChoice;
+        Scanner scanner = new Scanner(System.in);
+        do {
+            System.out.println("Are you a customer (1) or seller (2)? ");
+            viewChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (viewChoice != 1 && viewChoice != 2) {
+                System.out.println("Error.  Please enter either 1 or 2.");
+            }
+        } while (viewChoice != 1 && viewChoice != 2);
+
+        // Split of how different types of users have different views
+        // Think every user should have these fields
+        String username;
+        String password;
+        String id;
+
+        if (viewChoice == 1) {  // CUSTOMER
+
+            int existingAccount;
+            do {
+                System.out.println("Do you have an existing account (1 = Yes, 2 = No)? ");
+                existingAccount = scanner.nextInt();
+                scanner.nextLine();
+
+                if (existingAccount != 1 && existingAccount != 2) {
+                    System.out.println("Error.  Please enter either 1 or 2.");
+                }
+            } while (existingAccount != 1 && existingAccount != 2);
+
+
+
+            if (existingAccount == 1) {  // There is an existing account
+                int userIndex;
+                ArrayList<ArrayList<String>> existingUsers = loadCustomers();
+                while (true) {  // USERNAME
+                    System.out.println("Enter Username: ");
+                    username = scanner.nextLine().strip();
+                    if (existingUsers.get(0).contains(username)) {
+                        userIndex = existingUsers.get(0).indexOf(username);
+                        break;
+                    } else {
+                        System.out.println("User not found. Try again!\n");
+                    }
+                }
+                while (true) {  // PASSWORD
+                    System.out.println("Enter Password: ");
+                    password = scanner.nextLine();
+                    if (existingUsers.get(1).get(userIndex).equals(password)) {  // If password is correct
+                        break;
+                    } else {
+                        System.out.println("Incorrect Password. Try Again!\n");
+                    }
+                }
+
+
+
+
+            } else {  // Creating new account
+                System.out.println("Enter Username: ");
+                username = scanner.nextLine().strip();
+                System.out.println("Enter Password: ");
+                password = scanner.nextLine().strip();
+                id = generateID();
+
+                Customer customer = new Customer(username, password, id);
+            }
+
+            // Both should converge here
+
+
+
+
+        } else {  // SELLER
+
+        }
+    }
+
+    public static ArrayList<ArrayList<String>> loadCustomers() {  // Again not sure if the static method will mess anything up
+        // TODO: Read from database/CSV and return array list of String[]
+        // there should be 2 String[], one holding usernames, and one holding passwords
+        // Same indexes should be used to pair usernames and passwords
+        ArrayList<ArrayList<String>> userAndPass = new ArrayList<>();
+        return userAndPass;
+    }
+
+    public void loadMarket() {
+        // TODO: Not sure if this will return anything, but should load stores and products for customer
+    }
+
+    public static String generateID() {  // STATIC METHOD -> might mess up stuff
+        return "#44748282u8t";
+    }
+
+}
