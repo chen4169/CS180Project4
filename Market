@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -24,6 +26,9 @@ public class Market {
         String id;
 
         if (viewChoice == 1) {  // CUSTOMER
+            // loading existing customers
+            Customer customer;
+            ArrayList<ArrayList<String>> existingUsers = loadCustomers();
 
             int existingAccount;
             do {
@@ -39,8 +44,8 @@ public class Market {
 
 
             if (existingAccount == 1) {  // There is an existing account
-                int userIndex;
-                ArrayList<ArrayList<String>> existingUsers = loadCustomers();
+                int userIndex;  // user index relating username, password, and ids to a specific user
+
                 while (true) {  // USERNAME
                     System.out.println("Enter Username: ");
                     username = scanner.nextLine().strip();
@@ -61,21 +66,24 @@ public class Market {
                     }
                 }
 
-
-
+                customer = new Customer(existingUsers.get(0).get(userIndex),
+                        existingUsers.get(1).get(userIndex), existingUsers.get(2).get(userIndex));
 
             } else {  // Creating new account
                 System.out.println("Enter Username: ");
                 username = scanner.nextLine().strip();
                 System.out.println("Enter Password: ");
                 password = scanner.nextLine().strip();
-                id = generateID();
+                int size = existingUsers.get(2).size();
+                int newID = Integer.parseInt(existingUsers.get(2).get(size - 1) + 1); // makes an ID 1 more than prev
+                String strID = String.format("%s", newID);
 
-                Customer customer = new Customer(username, password, id);
+
+                customer = new Customer(username, password, strID);
             }
 
-            // Both should converge here
-
+            // Both should converge here: Should show the market and allow the user to purchase/add to cart
+            
 
 
 
@@ -84,20 +92,43 @@ public class Market {
         }
     }
 
-    public static ArrayList<ArrayList<String>> loadCustomers() {  // Again not sure if the static method will mess anything up
-        // TODO: Read from database/CSV and return array list of String[]
-        // there should be 2 String[], one holding usernames, and one holding passwords
-        // Same indexes should be used to pair usernames and passwords
-        ArrayList<ArrayList<String>> userAndPass = new ArrayList<>();
-        return userAndPass;
+    public static ArrayList<ArrayList<String>> loadCustomers() {  // Static Method *******
+        // This method reads the file and creates arraylist of arraylists of strings
+        // index 0 of array list is arraylist holding usernames
+        // index 1 = passwords
+        // index 2 = id's
+        // the second-dimension index is what matches the user's information between inner arraylists
+
+        ArrayList<String> usernames = new ArrayList<>();
+        ArrayList<String> passwords = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<>();
+        String s;
+        try (BufferedReader bfr = new BufferedReader(new FileReader("C:\\Users\\owenw" +
+                "\\OneDrive\\Desktop\\CS 180\\Proj4\\src\\customers.csv"))) {
+            while (true) {
+                s = bfr.readLine();
+                if (s == null) {
+                    break;
+                }
+                usernames.add(s.split(",")[0]);
+                passwords.add(s.split(",")[1]);
+                ids.add(s.split(",")[2]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ArrayList<ArrayList<String>> users = new ArrayList<>();
+        users.add(usernames);
+        users.add(passwords);
+        users.add(ids);
+
+        return users;
     }
 
     public void loadMarket() {
         // TODO: Not sure if this will return anything, but should load stores and products for customer
     }
 
-    public static String generateID() {  // STATIC METHOD -> might mess up stuff
-        return "#44748282u8t";
-    }
 
 }
