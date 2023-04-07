@@ -27,8 +27,11 @@ Dashboard: A class that provides statistics and information to sellers and custo
 
 Account: A class that represents a user account, containing properties such as the user's email and password.
 
-CSV format example:
+Product CSV format example:
 Product Name,Store Name,Description,Quantity,Price
 iPhone 13,Apple Store,A new iPhone with improved camera and longer battery life,10,999
 Samsung Galaxy S21,Samsung Store,A high-end Android phone with 5G capabilities,5,799
 AirPods Pro,Apple Store,Wireless earbuds with active noise cancellation,20,249
+
+Account CSV format:
+Index,username,password,seller of buyer
