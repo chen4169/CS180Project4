@@ -1,13 +1,15 @@
 package project4;
 
 public class Product {
+    private String id;
     private String name;
     private String description;
     private int quantity;
     private double price;
     private String seller;
 
-    public Product(String name, String description, int quantity, double price, String seller) {
+    public Product(String id, String name, String description, int quantity, double price, String seller) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.quantity = quantity;
@@ -53,6 +55,11 @@ public class Product {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s,%s,%s,%s,%s,%s", id, name, storeID, description, quantity, price);
     }
 }
 
