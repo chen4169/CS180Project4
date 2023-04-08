@@ -2,9 +2,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
-
-
 public class Market {
     public static void main(String[] args) {
         int viewChoice;
@@ -23,7 +22,7 @@ public class Market {
         // Think every user should have these fields
         String username;
         String password;
-        String id;
+
 
         if (viewChoice == 1) {  // CUSTOMER
             // loading existing customers
@@ -70,8 +69,13 @@ public class Market {
                         existingUsers.get(1).get(userIndex), existingUsers.get(2).get(userIndex));
 
             } else {  // Creating new account
-                System.out.println("Enter Username: ");
-                username = scanner.nextLine().strip();
+                do {
+                    System.out.println("Enter Username: ");
+                    username = scanner.nextLine().strip();
+                    if (existingUsers.get(0).contains(username)) {
+                        System.out.println("\n ERROR. Username already in use.\n");
+                    }
+                } while (existingUsers.get(0).contains(username));
                 System.out.println("Enter Password: ");
                 password = scanner.nextLine().strip();
                 int size = existingUsers.get(2).size();
@@ -80,10 +84,70 @@ public class Market {
 
 
                 customer = new Customer(username, password, strID);
+                customer.addNewCustomer("C:\\Users\\owenw\\OneDrive\\Desktop\\CS 180\\Proj4" +
+                        "\\src\\customers.csv");
             }
 
             // Both should converge here: Should show the market and allow the user to purchase/add to cart
-            
+            System.out.println("\n\n\n\n\n"); // just spacing
+            ArrayList<ArrayList<String>> marketData = loadMarket();
+            String cont;
+            while (true) {  // MAIN CUSTOMER LOOP
+                String choice = "";
+                for (ArrayList<String> line: marketData) {
+                    System.out.println("Store: " + line.get(0));
+                    System.out.println("Product: " + line.get(1));
+                    System.out.println("Description: " + line.get(2));
+                    System.out.println("Quantity: " + line.get(3));
+                    System.out.println("Price: $" + line.get(4));
+                    System.out.println("-----------------");
+                }
+
+                System.out.println("What would you like to do?");
+                System.out.println("(1) Search");
+                System.out.println("(2) Buy");
+                System.out.println("(3) Add item to cart");
+                System.out.println("ENTER CHOICE: ");
+                choice = scanner.nextLine();
+
+                if (choice.equals("1")) {
+                    System.out.println("Search: ");
+                    String search = scanner.nextLine().strip();
+                    ArrayList<ArrayList<String>> results = new ArrayList<>();
+
+                    for (ArrayList<String> line: marketData) {
+                        for (String s: line) {
+                            if (s.contains(search)) {
+                                results.add(line);
+                            }
+                        }
+                    }
+
+                    int counter = 1;
+                    for (ArrayList<String> product: results) {
+                        System.out.printf("--------[%d]--------\n", counter);
+                        System.out.println("Store: " + product.get(0));
+                        System.out.println("Product: " + product.get(1));
+                        System.out.println("Description: " + product.get(2));
+                        System.out.println("Quantity: " + product.get(3));
+                        System.out.println("Price: $" + product.get(4));
+                        counter++;
+                    }
+
+
+                } else if (choice.equals("2")) {
+                    System.out.println("Yay");
+                } else {
+                    System.out.println("yay");
+                }
+
+
+                System.out.println("\n\nContinue? (1) yes (2) no: ");
+                cont = scanner.nextLine();
+                if (cont.equals("2")) {
+                    break;
+                }
+            }
 
 
 
@@ -126,8 +190,23 @@ public class Market {
         return users;
     }
 
-    public void loadMarket() {
-        // TODO: Not sure if this will return anything, but should load stores and products for customer
+    public static ArrayList<ArrayList<String>> loadMarket() {
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        String s;
+        try (BufferedReader bfr = new BufferedReader(new FileReader("C:\\Users\\owenw\\OneDrive\\Desktop" +
+                "\\CS 180\\Proj4\\src\\market.csv"))) {
+            while (true) {
+                s = bfr.readLine();
+                if (s == null) {
+                    break;
+                }
+                ArrayList<String> temp = new ArrayList<String>(Arrays.asList(s.split(",")));
+                data.add(temp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 
