@@ -1,6 +1,8 @@
 package project4;
 /**
 *Sellers will be able to create stores to sell their products and maintain relationships with customers. 
+* Users can create, edit, and delete accounts for themselves.
+* There should be an email and password associated with each account.
 */
 public class Seller {
     private String username;
