@@ -1,5 +1,7 @@
 package project4;
-
+/**
+*Sellers will be able to create stores to sell their products and maintain relationships with customers. 
+*/
 public class Seller {
     private String username;
     private String password;
