@@ -1,7 +1,11 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+/**
+* Customers will be able to purchase products and contact sellers. 
+* Users can create, edit, and delete accounts for themselves.
+* There should be an email and password associated with each account.
+*/
 public class Customer {
     String username;
     String password;
