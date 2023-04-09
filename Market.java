@@ -337,21 +337,3 @@ public class Market {
         System.out.println("Thank you for using the market!");
     }
 }
-
-class Seller {
-    String username;
-    String password;
-    String id;
-    String name;
-    public Seller(String username, String password, String id, String name) {
-        this.username = username;
-        this.password = password;
-        this.id = id;
-        this.name = name;
-
-    }
-
-    public void addAccount() {
-        System.out.println("-------");
-    }
-}
