@@ -245,7 +245,93 @@ public class Market {
             }
 
         } else {  // seller interface
+            ArrayList<String> stores = new ArrayList<>(); // FIXME -> Get associated seller store IDs (could be ArrayList<int> as well)
 
+            while (true) {
+                int storeCounter = 1;
+                for (String store : stores) {
+                    System.out.printf("[%d]  STORE NAME\n", storeCounter);
+                    int storeId = Integer.parseInt(store.split(",")[0]);
+                    ArrayList<String> products = new ArrayList<>(); // FIXME -> get all products associated with a store id - also need to print store name (idk how to link)
+                    String[] tempProd = new String[6]; // indexing mentioned above
+
+                    for (String product : products) {
+                        tempProd = product.split(",");
+                        System.out.println("Store" + ""); // FIXME -> again don't know how to match this
+                        System.out.println("Product: " + tempProd[2]);
+                        System.out.println("Description: " + tempProd[3]);
+                        System.out.println("Quantity: " + tempProd[4]);
+                        System.out.println("Price: $" + tempProd[5]);
+                    }
+                    storeCounter++;
+                }
+
+                System.out.println("What would you like to do?");
+                System.out.println("(1) Remove Products");
+                System.out.println("(2) Add Products");
+                System.out.println("(3) View Sales");
+                System.out.println("(4) Quit");
+                System.out.println("Enter Choice: ");
+                String sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
+
+                if (sellerChoice.equals("1")) { // remove products
+                    System.out.println("Pick a store to remove product from (enter # associated w/ store): ");
+                    int storeIndex = scanner.nextInt() - 1; // no error check
+                    scanner.nextLine();
+                    String[] store = new String[3];
+                    store = stores.get(storeIndex).split(",");
+                    int storeId = Integer.parseInt(store[0]);
+
+
+                    int prodCounter = 1;
+                    ArrayList<String> storeProducts = new ArrayList<>();  // Get products attached to the store id
+                    for (String strProd: storeProducts) {
+                        System.out.printf("---------[%d]---------\n", prodCounter);
+                        String[] tempProd = new String[6]; // indexing mentioned above
+                        tempProd = strProd.split(",");
+                        System.out.println("Store:" + store[1]); // FIXME -> again don't know how to match this
+                        System.out.println("Product: " + tempProd[2]);
+                        System.out.println("Description: " + tempProd[3]);
+                        System.out.println("Quantity: " + tempProd[4]);
+                        System.out.println("Price: $" + tempProd[5]);
+                        prodCounter++;
+                    }
+
+                    System.out.println("Enter Number associated with product you want to remove: ");
+                    int removeIndex = scanner.nextInt() - 1;
+                    scanner.nextLine();
+                    int removeID = Integer.parseInt(storeProducts.get(removeIndex).split(",")[0]);
+
+                    storeProducts.remove(removeIndex);  // FIXME -> Remove This from store database (have the product ID and the store ID)
+
+                } else if (sellerChoice.equals("2")) { // add item
+                    System.out.println("Pick a store to add product to (enter # associated w/ store): ");
+                    int storeIndex = scanner.nextInt() - 1; // no error check
+                    scanner.nextLine();
+                    String[] store = new String[3];
+                    store = stores.get(storeIndex).split(",");
+                    int storeId = Integer.parseInt(store[0]);
+
+                    System.out.println("Enter Product Name: ");
+                    String name = scanner.nextLine();
+                    System.out.println("Enter Product Description: ");
+                    String desc = scanner.nextLine();
+                    System.out.println("Enter Quantity Available: ");
+                    int quant = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.println("Enter Price");
+                    double price = scanner.nextDouble();
+                    scanner.nextLine();
+
+                    // FIXME - ADD PRODUCT TO THE DATABASE -> STORE ID IS USER CHOSEN AND PRODUCT ID SHOULD BE CREATED
+
+                } else if (sellerChoice.equals("3")) { // checking sales
+                    // FIXME - SHOULD READ FROM THE USER PURCHASE HISTORY AND MATCH STUFF FROM SELLER OWNED STORES
+
+                } else { // anything else quits the loop
+                    break;
+                }
+            }
         }
 
         System.out.println("Thank you for using the market!");
