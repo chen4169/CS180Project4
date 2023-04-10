@@ -38,7 +38,7 @@ public class Market {
             // Also should be able to tell whether user has buyer or seller privs
 
             if (!username.equals("0") && !exists) {
-                System.out.println("Error.  Please enter either 1 or 2.");
+                System.out.println("Error.  Please enter a valid username or enter "0" to create a new account.");
             }
         } while (!username.equals("0") && !exists);
 
