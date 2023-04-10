@@ -12,17 +12,27 @@ public class Market {
         Customer customer = null;
         Seller seller = null;
         String username;
+        String id;
         boolean isCustomer;
+        boolean exists = true;
         Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter filepath for the database that will be used:");
+        String filepath = scanner.nextLine();
+        Database db = new Database(filepath);
         do {
             System.out.println("Enter Username (or 0 to create account):  ");
             username = scanner.nextLine();
-
-            // TODO -> Here look to see if username exists (do-while loop should continue until valid entry)
+            String buyerUser = String.valueOf(db.searchDB("Buyers.Buyer_Username", ("Buyers.Buyer_Username = " + username) ));
+            String sellerUser = String.valueOf(db.searchDB("Sellers.sellers_Username", ("Sellers.Sellers_Username = " + username) ));
+            if (!buyerUser.isEmpty()) {
+                isCustomer = false;
+            } else if (!sellerUser.isEmpty()) {
+                isCustomer = true;
+            } else {
+                exists = false;
+            }
+            //
             // Also should be able to tell whether user has buyer or seller privs
-            boolean exists = false;
-            isCustomer = true; // Maybe use this boolean to keep track of user type - false if seller
-
 
             if (!username.equals("0") && !exists) {
                 System.out.println("Error.  Please enter either 1 or 2.");
@@ -38,8 +48,8 @@ public class Market {
             while (true) {
                 System.out.println("Enter User Name: ");
                 username = scanner.nextLine();
-
-                if (username.equals("exists")) {  // FIXME -> If statement should make sure that the username chosen does not already exist
+                String checkUser = String.valueOf(db.searchDB("Buyers.Buyer_Username,Sellers.sellers_Username", ("Buyers.Buyer_Username = \"" + username + "\" or Sellers.sellers_Username = \"" + username + "\"")));
+                if (!checkUser.isEmpty()) {
                     break;
                 }
             }
@@ -61,21 +71,28 @@ public class Market {
 
 
             if (accountType.equals("1")) {  // Seller
-                String id = "";  // FIXME -> Should generate seller id for the user
-                seller = new Seller(username, password, id, name);
-                seller.addAccount();
+                db.addSeller(username, password, name);
+                id = String.valueOf(db.searchDB("Sellers.Sellers_ID", ("Sellers.Sellers_Username = \"" + username + "\"")));
+                seller = new Seller(username,password,id,name);
             }  else {  // Buyer
-                String id = "";  // FIXME -> Should generate buyer id for the user
+                db.addBuyer(username, password, name);
+                id = String.valueOf(db.searchDB("Buyers.Id", ("Buyers.Buyer_Username = \"" + username + "\"")));
                 customer = new Customer(username, password, id, name);
-                customer.addAccount("babab");  // Parameter is file name, but I'm not sure what to pass in
             }
 
 
         }
         else {  // User has existing account
-            String truePassword = "";  // FIXME -> should retrieve the user password based on their username
-            String id = "";  // FIXME -> should retrieve the id number corresponding to entered username
-            String name = "";  // FIXME -> should retrieve the name corresponding to entered username
+            if (isCustomer) {
+                String truePassword = String.valueOf(db.searchDB("Buyers.Buyer_Password", ("Buyers.Buyer_Username = \"" + username + "\"")));
+                id = String.valueOf(db.searchDB("Buyers.Id", ("Buyers.Buyer_Username = \"" + username + "\"")));
+                String name = String.valueOf(db.searchDB("Buyers.Buyer_Name", ("Buyers.Buyer_Username = \"" + username + "\"")));
+            } else {
+                String truePassword = String.valueOf(db.searchDB("Sellers.Sellers_Password", ("Sellers.Sellers_Username = \"" + username + "\"")));
+                id = String.valueOf(db.searchDB("Sellers.Sellers_ID", ("Sellers.Sellers_Username = \"" + username + "\"")));
+                String name =  String.valueOf(db.searchDB("Sellers.Sellers_Name", ("Sellers.Sellers_Username = \"" + username + "\"")));
+            }
+
 
             String guessPassword;
             while (true) {  // Entering PASSWORD
@@ -98,26 +115,26 @@ public class Market {
 
         // TODO: START OF MAIN LOOPS
         if (isCustomer) {
-            ArrayList<String> productData = new ArrayList<>(); // FIXME -> Should load the product data from database
-            ArrayList<String> storeData = new ArrayList<>(); // fixme -> Should load store data (To match products to stores)
+            ArrayList<String> productData = db.searchDB("Products.Product_name, Products.Product_description, " +
+                    "Products.Quantity_available, Products.Price, Markets.Store_name", "");
 
             String choice;
 
-                String[] singleProduct = new String[6];
-                // Index as follows; 0 = Product_ID, 1 = Product_name, 2 = Store_ID, 3 = Product_description,
-                // 4 = quantity available, 5 = price)
-                System.out.println("====================== Welcome to the Market ======================");
-                int counter = 1;
+            String[] singleProduct = new String[6];
+            // Index as follows; 0 = Product_ID, 1 = Product_name, 2 = Store_ID, 3 = Product_description,
+            // 4 = quantity available, 5 = price)
+            System.out.println("====================== Welcome to the Market ======================");
+            int counter = 1;
 
             while (true) {
                 for (String line: productData) {
                     singleProduct = line.split(",");
                     System.out.printf("---------[%d]---------\n", counter);
-                    System.out.println("Store: " + "");  // FIXME -> Not sure how to link the store name to product through data base
-                    System.out.println("Product: " + singleProduct[2]);
-                    System.out.println("Description: " + singleProduct[3]);
-                    System.out.println("Quantity: " + singleProduct[4]);
-                    System.out.println("Price: $" + singleProduct[5]);
+                    System.out.println("Store: " + singleProduct[4]);
+                    System.out.println("Product: " + singleProduct[0]);
+                    System.out.println("Description: " + singleProduct[1]);
+                    System.out.println("Quantity: " + singleProduct[2]);
+                    System.out.println("Price: $" + singleProduct[3]);
                     counter++;
                 }
 
@@ -132,17 +149,18 @@ public class Market {
                 if (choice.equals("1")) {  // SEARCHING
                     System.out.println("Search: ");
                     String search = scanner.nextLine().strip();
-                    ArrayList<String> results = new ArrayList<>();  // FIXME -> Search with the search term and add the lines to this
+                    ArrayList<String> results = db.searchDB("Products.Product_name, Products.Product_description, " +
+                            "Products.Quantity_available, Products.Price, Markets.Store_name", ("Products.Product_name = \"" + search + "\""));
 
                     counter = 1;
                     for (String line: results) {
                         singleProduct = line.split(",");
                         System.out.printf("---------[%d]---------\n", counter);
-                        System.out.println("Store: " + "");  // FIXME -> Not sure how to link the store name to product through data base
-                        System.out.println("Product: " + singleProduct[2]);
-                        System.out.println("Description: " + singleProduct[3]);
-                        System.out.println("Quantity: " + singleProduct[4]);
-                        System.out.println("Price: $" + singleProduct[5]);
+                        System.out.println("Store: " + singleProduct[4]);
+                        System.out.println("Product: " + singleProduct[0]);
+                        System.out.println("Description: " + singleProduct[1]);
+                        System.out.println("Quantity: " + singleProduct[2]);
+                        System.out.println("Price: $" + singleProduct[3]);
                         counter++;
                     }
 
@@ -226,42 +244,53 @@ public class Market {
                         }
                     } // else quit and continue
                 } else if (choice.equals("3")) {
-                    ArrayList<String> customerCart = new ArrayList<>();  // Load the user's shopping cart
+                    ArrayList<String> customerCart = db.searchDB(" Markets.Store_name, Products.Product_name, Products.Product_description, Products.Quantity_available, Products.Price", ("Buyers.Id = " + id));  // Load the user's shopping cart
 
                     System.out.printf("Customer %s's cart:\n", customer.name);
                     String[] tempProd = new String[6]; // indexing mentioned above
                     for (String s: customerCart) {
-                        System.out.println("Store" + ""); // FIXME -> again don't know how to match this
-                        System.out.println("Product: " + singleProduct[2]);
-                        System.out.println("Description: " + singleProduct[3]);
-                        System.out.println("Quantity: " + singleProduct[4]);
-                        System.out.println("Price: $" + singleProduct[5]);
+                        System.out.println("Store" + singleProduct[0]);
+                        System.out.println("Product: " + singleProduct[1]);
+                        System.out.println("Description: " + singleProduct[2]);
+                        System.out.println("Quantity: " + singleProduct[3]);
+                        System.out.println("Price: $" + singleProduct[4]);
                     }
 
-                    // TODO: From here add an ability to buy items off the cart (and then remove from the cart if bought)
                 } else if (choice.equals("4")) {
+                    ArrayList<String> results = db.searchDB("Products.Product_name, ", (" Buyers.Id = " + id + ";"));
+                    System.out.println("What Item would you like to buy from: " + results);
+                    String produtcBuy = scanner.nextLine();
+                    System.out.println("How many items would you like to buy");
+                    int numberProducts = scanner.nextInt();
+                    scanner.nextLine();
+                    int Availability = Integer.parseInt(String.valueOf(db.searchDB("Products.Quantity_available", ("Products.Product_name = \"" + produtcBuy + "\", Buyers.Id = \"" + id + "\";"))));
+                    if (numberProducts <= Availability) {
+                        String productID = String.valueOf(db.searchDB("Products.Product_ID", ("Products.Product_name = \"" + produtcBuy + "\", Buyers.Id = \"" + id + "\";")));
+                        db.Update("Products", ("" + (Availability - numberProducts)), productID);
+                        System.out.println("Product bought.");
+                    } else {
+                        System.out.println("Not enough Items available for purchase");
+                    }
                     break;
                 }
             }
 
         } else {  // seller interface
-            ArrayList<String> stores = new ArrayList<>(); // FIXME -> Get associated seller store IDs (could be ArrayList<int> as well)
 
             while (true) {
                 int storeCounter = 1;
                 for (String store : stores) {
                     System.out.printf("[%d]  STORE NAME\n", storeCounter);
-                    int storeId = Integer.parseInt(store.split(",")[0]);
-                    ArrayList<String> products = new ArrayList<>(); // FIXME -> get all products associated with a store id - also need to print store name (idk how to link)
+                    ArrayList<String> products = db.searchDB("Products.Product_name, Products.Product_description, Markets.Store_name, Products.Price, Products.Quantity_available", ("Buyers.Id = \"" + id + "\";"));
                     String[] tempProd = new String[6]; // indexing mentioned above
 
                     for (String product : products) {
                         tempProd = product.split(",");
-                        System.out.println("Store" + ""); // FIXME -> again don't know how to match this
-                        System.out.println("Product: " + tempProd[2]);
-                        System.out.println("Description: " + tempProd[3]);
+                        System.out.println("Store" + tempProd[2]);
+                        System.out.println("Product: " + tempProd[0]);
+                        System.out.println("Description: " + tempProd[1]);
                         System.out.println("Quantity: " + tempProd[4]);
-                        System.out.println("Price: $" + tempProd[5]);
+                        System.out.println("Price: $" + tempProd[3]);
                     }
                     storeCounter++;
                 }
@@ -284,16 +313,16 @@ public class Market {
 
 
                     int prodCounter = 1;
-                    ArrayList<String> storeProducts = new ArrayList<>();  // Get products attached to the store id
+                    ArrayList<String> storeProducts = db.searchDB("Products.Product_name, Products.Product_description, Products.Price, Products.Quantity_available, Markets.Store_name", ("Markets.Store_ID = \"" + storeId + "\";")); // Get products attached to the store id
                     for (String strProd: storeProducts) {
                         System.out.printf("---------[%d]---------\n", prodCounter);
                         String[] tempProd = new String[6]; // indexing mentioned above
                         tempProd = strProd.split(",");
-                        System.out.println("Store:" + store[1]); // FIXME -> again don't know how to match this
-                        System.out.println("Product: " + tempProd[2]);
-                        System.out.println("Description: " + tempProd[3]);
-                        System.out.println("Quantity: " + tempProd[4]);
-                        System.out.println("Price: $" + tempProd[5]);
+                        System.out.println("Store:" + store[4]);
+                        System.out.println("Product: " + tempProd[0]);
+                        System.out.println("Description: " + tempProd[1]);
+                        System.out.println("Quantity: " + tempProd[3]);
+                        System.out.println("Price: $" + tempProd[2]);
                         prodCounter++;
                     }
 
@@ -301,8 +330,7 @@ public class Market {
                     int removeIndex = scanner.nextInt() - 1;
                     scanner.nextLine();
                     int removeID = Integer.parseInt(storeProducts.get(removeIndex).split(",")[0]);
-
-                    storeProducts.remove(removeIndex);  // FIXME -> Remove This from store database (have the product ID and the store ID)
+                    db.delete("Markets", ("Markets.Store_ID = " + removeID));
 
                 } else if (sellerChoice.equals("2")) { // add item
                     System.out.println("Pick a store to add product to (enter # associated w/ store): ");
@@ -320,10 +348,10 @@ public class Market {
                     int quant = scanner.nextInt();
                     scanner.nextLine();
                     System.out.println("Enter Price");
-                    double price = scanner.nextDouble();
+                    int price = scanner.nextInt();
                     scanner.nextLine();
 
-                    // FIXME - ADD PRODUCT TO THE DATABASE -> STORE ID IS USER CHOSEN AND PRODUCT ID SHOULD BE CREATED
+                    db.addProduct(name, storeIndex, desc, quant, price);
 
                 } else if (sellerChoice.equals("3")) { // checking sales
                     // FIXME - SHOULD READ FROM THE USER PURCHASE HISTORY AND MATCH STUFF FROM SELLER OWNED STORES
