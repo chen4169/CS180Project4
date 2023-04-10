@@ -81,7 +81,7 @@ public class Market {
                 System.out.println("Do you want a (1) Seller or (2) Customer account? ");
                 accountType = scanner.nextLine();
                 if (!(accountType.equals("1") || accountType.equals("2"))) {
-                    System.out.println("Error.  Invalid!");
+                    System.out.println("Error. Invalid account type! Select 1 or 2.");
                 }
             } while (!(accountType.equals("1") || accountType.equals("2")));
 
@@ -156,13 +156,19 @@ public class Market {
                     counter++;
                 }
 
-                System.out.println("What would you like to do?");
-                System.out.println("(1) Search");
-                System.out.println("(2) Choose Product");
-                System.out.println("(3) View cart");
-                System.out.println("(4) Quit");
-                System.out.println("ENTER CHOICE: ");
-                choice = scanner.nextLine();
+                do { //error checking in do-while loop
+                    System.out.println("What would you like to do?");
+                    System.out.println("(1) Search");
+                    System.out.println("(2) Choose Product");
+                    System.out.println("(3) View cart");
+                    System.out.println("(4) Quit");
+                    System.out.println("ENTER CHOICE: ");
+                    choice = scanner.nextLine();
+
+                    if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3") && !choice.equals("4")) {
+                        System.out.println("Error. Please enter a valid selection: 1, 2, 3, or 4.");
+                    }
+                } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3") && !choice.equals("4"));
 
                 if (choice.equals("1")) {  // SEARCHING
                     System.out.println("Search: ");
@@ -251,7 +257,7 @@ public class Market {
                         }
                     } while (!success);
                     
-                    do {
+                    do { //do while error check
                         System.out.println("(1) Add Item to Cart");
                         System.out.println("(2) Purchase Item");
                         System.out.println("(3) Quit");
@@ -323,14 +329,23 @@ public class Market {
                 }
 
 
+              String sellerChoice;
+                do {
                 System.out.println("What would you like to do?");
                 System.out.println("(1) Remove Products");
                 System.out.println("(2) Add Products");
                 System.out.println("(3) View Sales");
-                System.out.println("(4) Add Store");
-                System.out.println("(5) Quit");
+                System.out.println("(4) Quit");
                 System.out.println("Enter Choice: ");
-                String sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
+                sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
+
+                    if (!sellerChoice.equals("1") && !sellerChoice.equals("2") && !sellerChoice.equals("3") && 
+                            !sellerChoice.equals("4")) {
+                        System.out.println("Error. Please enter a valid selection: 1, 2, 3, or 4.");
+                    }
+                } while (!sellerChoice.equals("1") && !sellerChoice.equals("2") && !sellerChoice.equals("3") && 
+                        !sellerChoice.equals("4"));
+
 
                 if (sellerChoice.equals("1")) { // remove products
 
