@@ -53,11 +53,24 @@ public class Market {
                     break;
                 }
             }
-            System.out.println("Enter Password: ");
-            String password = scanner.nextLine();
-            System.out.println("Enter Name: ");
-            String name = scanner.nextLine();
-
+            
+            String password;
+            do {
+                System.out.println("Enter Password: ");
+                password = scanner.nextLine();
+                if (password.equals("")) {
+                    System.out.println("Error. Password cannot be empty!");
+                }
+            } while (password.equals(""));
+            
+            String name;
+            do {
+                System.out.println("Enter Name: ");
+                name = scanner.nextLine();
+                if (name.equals("")) {
+                    System.out.println("Error. Name cannot be empty!");
+                }
+            } while(name.equals(""));
 
             // Choosing account type
             String accountType;
