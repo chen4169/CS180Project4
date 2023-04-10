@@ -143,13 +143,20 @@ public class Market {
                     counter++;
                 }
 
-                System.out.println("What would you like to do?");
-                System.out.println("(1) Search");
-                System.out.println("(2) Choose Product");
-                System.out.println("(3) View cart");
-                System.out.println("(4) Quit");
-                System.out.println("ENTER CHOICE: ");
-                choice = scanner.nextLine();
+                do { //error checking in do-while loop
+                    System.out.println("What would you like to do?");
+                    System.out.println("(1) Search");
+                    System.out.println("(2) Choose Product");
+                    System.out.println("(3) View cart");
+                    System.out.println("(4) Quit");
+                    System.out.println("ENTER CHOICE: ");
+                    choice = scanner.nextLine();
+
+                    if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3") && !choice.equals("4")) {
+                        System.out.println("Error. Please enter a valid selection: 1, 2, 3, or 4.");
+                    }
+                } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3") && !choice.equals("4"));
+
 
                 if (choice.equals("1")) {  // SEARCHING
                     System.out.println("Search: ");
@@ -232,11 +239,17 @@ public class Market {
                         }
                     } while (!success);
 
-                    System.out.println("(1) Add Item to Cart");
-                    System.out.println("(2) Purchase Item");
-                    System.out.println("(3) Quit");
-                    choice = scanner.nextLine();
+                    do { //do while error check
+                        System.out.println("(1) Add Item to Cart");
+                        System.out.println("(2) Purchase Item");
+                        System.out.println("(3) Quit");
+                        choice = scanner.nextLine();
+                        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
+                            System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
+                        }
+                    } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
+                    
                     if (choice.equals("1")) {  // Add to cart
                         customer.addToCart(product);
                     } else if (choice.equals("2")) {  // Buy
@@ -298,14 +311,23 @@ public class Market {
                 }
 
 
-                System.out.println("What would you like to do?");
-                System.out.println("(1) Remove Products");
-                System.out.println("(2) Add Products");
-                System.out.println("(3) View Sales");
-                System.out.println("(4) Add Store");
-                System.out.println("(5) Quit");
-                System.out.println("Enter Choice: ");
-                String sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
+                String sellerChoice;
+                do {
+                    System.out.println("What would you like to do?");
+                    System.out.println("(1) Remove Products");
+                    System.out.println("(2) Add Products");
+                    System.out.println("(3) View Sales");
+                    System.out.println("(4) Add Store");
+                    System.out.println("(5) Quit");
+                    System.out.println("Enter Choice: ");
+                    sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
+
+                    if (!sellerChoice.equals("1") && !sellerChoice.equals("2") && !sellerChoice.equals("3") &&
+                            !sellerChoice.equals("4") && !sellerChoice.equals("5")) {
+                        System.out.println("Error. Please enter a valid selection: 1, 2, 3, or 4.");
+                    }
+                } while (!sellerChoice.equals("1") && !sellerChoice.equals("2") && !sellerChoice.equals("3") &&
+                        !sellerChoice.equals("4") && !sellerChoice.equals("5")); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
 
                 if (sellerChoice.equals("1")) { // remove products
                     /*
@@ -381,16 +403,16 @@ public class Market {
                         String[] store = s.split(",");
                         String sid = store[1]; // store id
                         System.out.println("SALES FOR: " + store[0]); // store's name
-                        
+
                         double totalRev = 0;
                         ArrayList<String> storeProducts = db.searchDB("Products.Product_ID, Products.Product_name", ("Products.Store_ID = \"" + sid + "\";"));;  // Use store ID And name to display sales by store
-                        
+
                         for (String prod: storeProducts) {
                             tempProd = prod.split(",");
                             ArrayList<String> purchases = new ArrayList<>(); // FIXME -> NEEDS TO BE ADDED TO THE DATABASE - should find all the user purchase
                             for (String p: purchases) {
                                 String[] pur = p.split(",");  // INDEXING: 0 = product ID, 1 = buyer ID, 2 = buyer username, 3 = store ID, 4 = quantity, 5 = price, 6 = product name
-                                
+
                                 totalRev += Double.parseDouble(pur[3]) * Double.parseDouble(pur[4]);
                                 System.out.printf("\t%s Purchased %s of %s\n", pur[2], pur[4], tempProd[1]);
                             }
