@@ -20,7 +20,7 @@ public class Market {
         String filepath = scanner.nextLine();
         Database db = new Database(filepath);
         do {
-            System.out.println("Enter Username (or 0 to create account):  ");
+            System.out.println("Enter Username (or 0 to create an account):  ");
             username = scanner.nextLine();
             String buyerUser = String.valueOf(db.searchDB("Buyers.Buyer_Username", ("Buyers.Buyer_Username = " + username) ));
             String sellerUser = String.valueOf(db.searchDB("Sellers.sellers_Username", ("Sellers.Sellers_Username = " + username) ));
@@ -35,7 +35,7 @@ public class Market {
             // Also should be able to tell whether user has buyer or seller privs
 
             if (!username.equals("0") && !exists) {
-                System.out.println("Error.  Please enter either 1 or 2.");
+                System.out.println("Error.  Please enter a username or "0" to create an account.");
             }
         } while (!username.equals("0") && !exists);
 
@@ -186,11 +186,17 @@ public class Market {
                         }
                     } while (!success);
 
-                    System.out.println("What would you like to do?");  // FIXME -> do-while error check maybe
-                    System.out.println("(1) Add Item to Cart");
-                    System.out.println("(2) Purchase Item");
-                    System.out.println("(3) Quit Search");
-                    choice = scanner.nextLine();
+                    do {
+                        System.out.println("What would you like to do?");  // do-while error check on client selections
+                        System.out.println("(1) Add Item to Cart");
+                        System.out.println("(2) Purchase Item");
+                        System.out.println("(3) Quit Search");
+                        choice = scanner.nextLine();
+                        
+                        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
+                            System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
+                        }
+                    } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
                     if (choice.equals("1")) {
                         customer.addToCart(product);
@@ -227,10 +233,16 @@ public class Market {
                         }
                     } while (!success);
 
+                   do {
                     System.out.println("(1) Add Item to Cart");
                     System.out.println("(2) Purchase Item");
                     System.out.println("(3) Quit");
                     choice = scanner.nextLine();
+
+                    if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
+                        System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
+                    }
+                } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
                     if (choice.equals("1")) {  // Add to cart
                         customer.addToCart(product);
