@@ -13,14 +13,17 @@ public class Market {
         Seller seller = null;
         String username;
         String id;
-        boolean isCustomer;
+        boolean isCustomer = true;
         boolean exists = true;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter filepath for the database that will be used:");
         String filepath = scanner.nextLine();
+
+        // FIXME -> Remove after testing
+        filepath = "C:\\Users\\owenw\\OneDrive\\Desktop\\CS 180\\Proj4\\src\\Database1.accdb";
         Database db = new Database(filepath);
         do {
-            System.out.println("Enter Username (or 0 to create an account):  ");
+            System.out.println("Enter Username (or 0 to create account):  ");
             username = scanner.nextLine();
             String buyerUser = String.valueOf(db.searchDB("Buyers.Buyer_Username", ("Buyers.Buyer_Username = " + username) ));
             String sellerUser = String.valueOf(db.searchDB("Sellers.sellers_Username", ("Sellers.Sellers_Username = " + username) ));
@@ -35,7 +38,7 @@ public class Market {
             // Also should be able to tell whether user has buyer or seller privs
 
             if (!username.equals("0") && !exists) {
-                System.out.println("Error.  Please enter a username or "0" to create an account.");
+                System.out.println("Error.  Please enter either 1 or 2.");
             }
         } while (!username.equals("0") && !exists);
 
@@ -53,24 +56,11 @@ public class Market {
                     break;
                 }
             }
-            
-            String password;
-            do {
-                System.out.println("Enter Password: ");
-                password = scanner.nextLine();
-                if (password.equals("")) {
-                    System.out.println("Error. Password cannot be empty!");
-                }
-            } while (password.equals(""));
-            
-            String name;
-            do {
-                System.out.println("Enter Name: ");
-                name = scanner.nextLine();
-                if (name.equals("")) {
-                    System.out.println("Error. Name cannot be empty!");
-                }
-            } while(name.equals(""));
+            System.out.println("Enter Password: ");
+            String password = scanner.nextLine();
+            System.out.println("Enter Name: ");
+            String name = scanner.nextLine();
+
 
             // Choosing account type
             String accountType;
@@ -96,14 +86,16 @@ public class Market {
 
         }
         else {  // User has existing account
+            String truePassword = "";
+            String name = "";
             if (isCustomer) {
-                String truePassword = String.valueOf(db.searchDB("Buyers.Buyer_Password", ("Buyers.Buyer_Username = \"" + username + "\"")));
+                truePassword = String.valueOf(db.searchDB("Buyers.Buyer_Password", ("Buyers.Buyer_Username = \"" + username + "\"")));
                 id = String.valueOf(db.searchDB("Buyers.Id", ("Buyers.Buyer_Username = \"" + username + "\"")));
-                String name = String.valueOf(db.searchDB("Buyers.Buyer_Name", ("Buyers.Buyer_Username = \"" + username + "\"")));
+                name = String.valueOf(db.searchDB("Buyers.Buyer_Name", ("Buyers.Buyer_Username = \"" + username + "\"")));
             } else {
-                String truePassword = String.valueOf(db.searchDB("Sellers.Sellers_Password", ("Sellers.Sellers_Username = \"" + username + "\"")));
+                truePassword = String.valueOf(db.searchDB("Sellers.Sellers_Password", ("Sellers.Sellers_Username = \"" + username + "\"")));
                 id = String.valueOf(db.searchDB("Sellers.Sellers_ID", ("Sellers.Sellers_Username = \"" + username + "\"")));
-                String name =  String.valueOf(db.searchDB("Sellers.Sellers_Name", ("Sellers.Sellers_Username = \"" + username + "\"")));
+                name =  String.valueOf(db.searchDB("Sellers.Sellers_Name", ("Sellers.Sellers_Username = \"" + username + "\"")));
             }
 
 
@@ -199,17 +191,11 @@ public class Market {
                         }
                     } while (!success);
 
-                    do {
-                        System.out.println("What would you like to do?");  // do-while error check on client selections
-                        System.out.println("(1) Add Item to Cart");
-                        System.out.println("(2) Purchase Item");
-                        System.out.println("(3) Quit Search");
-                        choice = scanner.nextLine();
-                        
-                        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
-                            System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
-                        }
-                    } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
+                    System.out.println("What would you like to do?");  // FIXME -> do-while error check maybe
+                    System.out.println("(1) Add Item to Cart");
+                    System.out.println("(2) Purchase Item");
+                    System.out.println("(3) Quit Search");
+                    choice = scanner.nextLine();
 
                     if (choice.equals("1")) {
                         customer.addToCart(product);
@@ -246,16 +232,10 @@ public class Market {
                         }
                     } while (!success);
 
-                   do {
                     System.out.println("(1) Add Item to Cart");
                     System.out.println("(2) Purchase Item");
                     System.out.println("(3) Quit");
                     choice = scanner.nextLine();
-
-                    if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
-                        System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
-                    }
-                } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
                     if (choice.equals("1")) {  // Add to cart
                         customer.addToCart(product);
@@ -284,13 +264,13 @@ public class Market {
                 } else if (choice.equals("4")) {
                     ArrayList<String> results = db.searchDB("Products.Product_name, ", (" Buyers.Id = " + id + ";"));
                     System.out.println("What Item would you like to buy from: " + results);
-                    String produtcBuy = scanner.nextLine();
+                    String productBuy = scanner.nextLine();
                     System.out.println("How many items would you like to buy");
                     int numberProducts = scanner.nextInt();
                     scanner.nextLine();
-                    int Availability = Integer.parseInt(String.valueOf(db.searchDB("Products.Quantity_available", ("Products.Product_name = \"" + produtcBuy + "\", Buyers.Id = \"" + id + "\";"))));
+                    int Availability = Integer.parseInt(String.valueOf(db.searchDB("Products.Quantity_available", ("Products.Product_name = \"" + productBuy + "\", Buyers.Id = \"" + id + "\";"))));
                     if (numberProducts <= Availability) {
-                        String productID = String.valueOf(db.searchDB("Products.Product_ID", ("Products.Product_name = \"" + produtcBuy + "\", Buyers.Id = \"" + id + "\";")));
+                        String productID = String.valueOf(db.searchDB("Products.Product_ID", ("Products.Product_name = \"" + productBuy + "\", Buyers.Id = \"" + id + "\";")));
                         db.Update("Products", ("" + (Availability - numberProducts)), productID);
                         System.out.println("Product bought.");
                     } else {
@@ -301,44 +281,46 @@ public class Market {
             }
 
         } else {  // seller interface
-
+            id = seller.getId();
             while (true) {
-                int storeCounter = 1;
-                for (String store : stores) {
-                    System.out.printf("[%d]  STORE NAME\n", storeCounter);
-                    ArrayList<String> products = db.searchDB("Products.Product_name, Products.Product_description, Markets.Store_name, Products.Price, Products.Quantity_available", ("Buyers.Id = \"" + id + "\";"));
-                    String[] tempProd = new String[6]; // indexing mentioned above
+                int prodCounter = 1;
+                ArrayList<String> products = db.searchDB("Products.Product_name, Products.Product_description, Markets.Store_name, Products.Price, Products.Quantity_available", ("Buyers.Id = \"" + id + "\";"));
+                String[] tempProd = new String[6]; // indexing mentioned above
 
-                    for (String product : products) {
-                        tempProd = product.split(",");
-                        System.out.println("Store" + tempProd[2]);
-                        System.out.println("Product: " + tempProd[0]);
-                        System.out.println("Description: " + tempProd[1]);
-                        System.out.println("Quantity: " + tempProd[4]);
-                        System.out.println("Price: $" + tempProd[3]);
-                    }
-                    storeCounter++;
+                for (String product : products) {
+                    System.out.printf("=============={Prod #: %d}==============\n", prodCounter);
+                    tempProd = product.split(",");
+                    System.out.println("Store" + tempProd[2]);
+                    System.out.println("Product: " + tempProd[0]);
+                    System.out.println("Description: " + tempProd[1]);
+                    System.out.println("Quantity: " + tempProd[4]);
+                    System.out.println("Price: $" + tempProd[3]);
                 }
+
 
                 System.out.println("What would you like to do?");
                 System.out.println("(1) Remove Products");
                 System.out.println("(2) Add Products");
                 System.out.println("(3) View Sales");
-                System.out.println("(4) Quit");
+                System.out.println("(4) Add Store");
+                System.out.println("(5) Quit");
                 System.out.println("Enter Choice: ");
                 String sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
 
                 if (sellerChoice.equals("1")) { // remove products
+
+                    /*
                     System.out.println("Pick a store to remove product from (enter # associated w/ store): ");
                     int storeIndex = scanner.nextInt() - 1; // no error check
                     scanner.nextLine();
                     String[] store = new String[3];
-                    store = stores.get(storeIndex).split(",");
+
                     int storeId = Integer.parseInt(store[0]);
 
 
                     int prodCounter = 1;
                     ArrayList<String> storeProducts = db.searchDB("Products.Product_name, Products.Product_description, Products.Price, Products.Quantity_available, Markets.Store_name", ("Markets.Store_ID = \"" + storeId + "\";")); // Get products attached to the store id
+                    store = storeProducts.get(storeIndex).split(",");
                     for (String strProd: storeProducts) {
                         System.out.printf("---------[%d]---------\n", prodCounter);
                         String[] tempProd = new String[6]; // indexing mentioned above
@@ -350,20 +332,30 @@ public class Market {
                         System.out.println("Price: $" + tempProd[2]);
                         prodCounter++;
                     }
+                     */
 
                     System.out.println("Enter Number associated with product you want to remove: ");
                     int removeIndex = scanner.nextInt() - 1;
                     scanner.nextLine();
-                    int removeID = Integer.parseInt(storeProducts.get(removeIndex).split(",")[0]);
+                    int removeID = Integer.parseInt(products.get(removeIndex).split(",")[0]);
                     db.delete("Markets", ("Markets.Store_ID = " + removeID));
 
                 } else if (sellerChoice.equals("2")) { // add item
-                    System.out.println("Pick a store to add product to (enter # associated w/ store): ");
-                    int storeIndex = scanner.nextInt() - 1; // no error check
+                    ArrayList<String> storeNames = new ArrayList<>();  // FIXME -> GET ALL STORE NAMES ASSOCIATED TO SELLER -> format: "storeName,storeID"
+
+                    int storeCounter = 1;
+                    for (String s: storeNames) {
+                        System.out.printf("==========={%d}==========", storeCounter);
+                        System.out.println(s.split(",")[0]);
+                        storeCounter++;
+                    }
+
+                    System.out.println("Pick a store to add product to (enter # corresponding to): ");
+                    int storeIndex = scanner.nextInt() - 1;
                     scanner.nextLine();
-                    String[] store = new String[3];
-                    store = stores.get(storeIndex).split(",");
-                    int storeId = Integer.parseInt(store[0]);
+
+                    String[] chosenStore = storeNames.get(storeIndex).split(",");
+                    int storeID = Integer.parseInt(chosenStore[1]); // no error check
 
                     System.out.println("Enter Product Name: ");
                     String name = scanner.nextLine();
@@ -372,15 +364,18 @@ public class Market {
                     System.out.println("Enter Quantity Available: ");
                     int quant = scanner.nextInt();
                     scanner.nextLine();
-                    System.out.println("Enter Price");
+                    System.out.print("Enter Price: $");
                     int price = scanner.nextInt();
                     scanner.nextLine();
 
-                    db.addProduct(name, storeIndex, desc, quant, price);
+                    db.addProduct(name, storeID, desc, quant, price);
 
                 } else if (sellerChoice.equals("3")) { // checking sales
                     // FIXME - SHOULD READ FROM THE USER PURCHASE HISTORY AND MATCH STUFF FROM SELLER OWNED STORES
-
+                    
+                    
+                } else if (sellerChoice.equals("4")) {
+                    // TODO: PROMPT THE USER TO ENTER NAME OF STORE and create store with that name
                 } else { // anything else quits the loop
                     break;
                 }
