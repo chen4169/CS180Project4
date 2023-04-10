@@ -6,8 +6,11 @@ public class Database {
     public Database(String filepath) {
         String url = "jdbc:ucanaccess:" + filepath;
         try {
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
             this.con = DriverManager.getConnection(url);
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
