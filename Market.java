@@ -249,7 +249,7 @@ public class Market {
                         }
                     } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
-                    
+
                     if (choice.equals("1")) {  // Add to cart
                         customer.addToCart(product);
                     } else if (choice.equals("2")) {  // Buy
@@ -294,6 +294,7 @@ public class Market {
             }
 
         } else {  // seller interface
+            
             id = seller.getId();
             while (true) {
                 int prodCounter = 1;
@@ -359,12 +360,11 @@ public class Market {
                     int removeIndex = scanner.nextInt() - 1;
                     scanner.nextLine();
                     int removeID = Integer.parseInt(products.get(removeIndex).split(",")[0]);
-                    db.delete("Markets", ("Markets.Store_ID = " + removeID));
+                    db.delete("Markets", ("Markets.Store_ID = " + removeID));  
 
                 } else if (sellerChoice.equals("2")) { // add item
 
-                    ArrayList<String> storeNames = new ArrayList<>();  // FIXME -> GET ALL STORE NAMES ASSOCIATED TO SELLER -> format: "storeName,storeID"
-                    storeNames = db.searchDB("Markets.Store_name, Markets.Store_ID", ("Buyers.Id = \"" + id + "\";"));
+                    ArrayList<String> storeNames = db.searchDB("Markets.Store_name, Markets.Store_ID", ("Buyers.Id = \"" + id + "\";"));  // FIXME -> Will this work?
 
                     int storeCounter = 1;
                     for (String s: storeNames) {
@@ -396,6 +396,8 @@ public class Market {
                 } else if (sellerChoice.equals("3")) { // checking sales by store
                     // FIXME - SHOULD READ FROM THE USER PURCHASE HISTORY AND MATCH STUFF FROM SELLER OWNED STORES
                     double entireRev = 0;
+
+                    // FIXME -> Will this work?
                     ArrayList<String> stores = db.searchDB("Markets.Store_name, Markets.Store_ID",
                             ("Buyers.Id = \"" + id + "\";"));
 
@@ -405,6 +407,7 @@ public class Market {
                         System.out.println("SALES FOR: " + store[0]); // store's name
 
                         double totalRev = 0;
+                        // FIXME -> Will this work?
                         ArrayList<String> storeProducts = db.searchDB("Products.Product_ID, Products.Product_name", ("Products.Store_ID = \"" + sid + "\";"));;  // Use store ID And name to display sales by store
 
                         for (String prod: storeProducts) {
@@ -427,6 +430,7 @@ public class Market {
                     System.out.println("Enter Name of store: ");
                     String newStoreName = scanner.nextLine();
 
+                    // FIXME -> Will this work?
                     db.addMarket(newStoreName, Integer.parseInt(seller.getId()));
                 } else { // anything else quits the loop
                     break;
