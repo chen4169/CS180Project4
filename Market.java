@@ -56,11 +56,24 @@ public class Market {
                     break;
                 }
             }
-            System.out.println("Enter Password: ");
-            String password = scanner.nextLine();
-            System.out.println("Enter Name: ");
-            String name = scanner.nextLine();
+            
+            String password;
+            do {
+                System.out.println("Enter Password: ");
+                password = scanner.nextLine();
+                if (password.equals("")) {
+                    System.out.println("Error. Password cannot be empty!");
+                }
+            } while (password.equals(""));
 
+            String name;
+            do {
+                System.out.println("Enter Name: ");
+                name = scanner.nextLine();
+                if (name.equals("")) {
+                    System.out.println("Error. Name cannot be empty!");
+                }
+            } while(name.equals(""));
 
             // Choosing account type
             String accountType;
@@ -191,11 +204,17 @@ public class Market {
                         }
                     } while (!success);
 
-                    System.out.println("What would you like to do?");  // FIXME -> do-while error check maybe
-                    System.out.println("(1) Add Item to Cart");
-                    System.out.println("(2) Purchase Item");
-                    System.out.println("(3) Quit Search");
-                    choice = scanner.nextLine();
+                    do {
+                        System.out.println("What would you like to do?");  // do-while error check on client selections
+                        System.out.println("(1) Add Item to Cart");
+                        System.out.println("(2) Purchase Item");
+                        System.out.println("(3) Quit Search");
+                        choice = scanner.nextLine();
+
+                        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
+                            System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
+                        }
+                    } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
                     if (choice.equals("1")) {
                         customer.addToCart(product);
@@ -231,11 +250,17 @@ public class Market {
                             success = false;
                         }
                     } while (!success);
+                    
+                    do {
+                        System.out.println("(1) Add Item to Cart");
+                        System.out.println("(2) Purchase Item");
+                        System.out.println("(3) Quit");
+                        choice = scanner.nextLine();
 
-                    System.out.println("(1) Add Item to Cart");
-                    System.out.println("(2) Purchase Item");
-                    System.out.println("(3) Quit");
-                    choice = scanner.nextLine();
+                        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
+                            System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
+                        }
+                    } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
 
                     if (choice.equals("1")) {  // Add to cart
                         customer.addToCart(product);
