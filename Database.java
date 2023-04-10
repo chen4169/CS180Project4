@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class Database {
     private Connection con;
     public Database(String filepath) {
-        String url = "jdbc:ucanaccess:" + filepath;
+       String url = "jdbc:ucanaccess://" + filepath;
         try {
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
             this.con = DriverManager.getConnection(url);
