@@ -7,6 +7,7 @@ public class Product {
     private int quantity;
     private double price;
     private String seller;
+    //private int storeID;
 
     public Product(String id, String name, String description, int quantity, double price, String seller) {
         this.id = id;
@@ -15,8 +16,17 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.seller = seller;
+        //this.storeID = storeID;
+    }
+/**
+    public int getStoreID() {
+        return storeID;
     }
 
+    public void setStoreID(int storeID) {
+        this.storeID = storeID;
+    }
+ */
     public String getSeller() {
         return seller;
     }
@@ -24,7 +34,7 @@ public class Product {
     public void setSeller(String name) {
         this.seller = seller;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -56,10 +66,9 @@ public class Product {
     public void setPrice(double price) {
         this.price = price;
     }
-    
+
     @Override
     public String toString() {
-        return String.format("%s,%s,%s,%s,%s,%s", id, name, storeID, description, quantity, price);
+        return String.format("%s,%s,%s,%s,%s,%s", id, name, description, quantity, price);
     }
 }
-
