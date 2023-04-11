@@ -1,6 +1,10 @@
 # CS180 - Project 4 Report
 
 ## Part One: The Project and its Functionality
+For project 4 our team decided to go through with option three, which takes on the task of implementing the official marketplace of the application. The
+theme of the marketplace is that it will allow sellers to list their products and customers to purchase them. 
+
+(my thoughts are we explain the separate classes first, and then tie them in with how the main method goes about connecting everything)
 
 
 
