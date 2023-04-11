@@ -28,7 +28,9 @@ If I were to start over againI probably would have avoided the integration of th
 
 
 ### Libin Chen
-//individual writing
+For project 4, my contributions are mainly to company the codes written by the members of our group, make suggestions to the structure of the program, provide clear and concise guidelines for what classes we might implement, assist and help the rest of team members to implement any codes, methods, and classes they ask. I am responsible for the Product class, Seller class, and a little of the Market class. Meanwhile, I also contributed the detailed comments of the Database class, Market class, and the debugging process of all our codes. I also written the Part Three of our report for project 4. At the beginning of the project, I made documents like Instruction.txt to try to communicate with our members to get the best approach to accomplish our goals. I suggested that we could use CSV files to store our data of users and build up the whole program upon this data store structure. However, after in-depth discussion about the data structure, we have decided to use Database to store our data since one of our group members is very familiar with it. Finally, I am the one that is responsible for creating our GitHub repository for project 4 and introduce to the group members some features about the GitHub repository.
+During the coding period, I suggested that we could create an abstract User class for both Seller and Customer, then let Seller and Customer classes extend the User class. Additionally, I also suggested that we should put codes separated into different methods instead of writing them into a single main method because that would make the debugging process very difficult. However, since one of our teammates has almost finished his codes, we decided to not start over again on our codes. If I was given the opportunity to start over again, I think I might want to implement these changes to our codes.
+
 
 ### Thomas Eggers
 //individual writing
