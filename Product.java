@@ -1,3 +1,7 @@
+/**
+* A class with normal setter and getter methods used for creating product object with all the information 
+* (id, name, description, quantity, price, seller). It is like a product.
+*/
 public class Product {
     private String id;
     private String name;
