@@ -37,10 +37,15 @@ Firstly, we'll break down the complex program into smaller, simpler cases and as
 Finally, we'll create a schedule for Project 5 and share it with everyone through our GitHub repository like what we have done for project 4. This will ensure that everyone is aware of the project timeline and can plan their work accordingly. By following this strategy, we believe we can work together more efficiently and effectively, and ultimately achieve a successful outcome for our next project.
 
 For the tasks list, we believe that the most important and challenging implementations are the exchange of information between server and client, the concurrency of threads to avoid race condition, and the GUI windows design. Thus, we might follow the list below for our project 5:
+
 “Develop Server and Client class, along with network connection” – Completed by   04/17/2023 – Jaime Rueda
+
 “Develop concurrency of threads to avoid race condition” – Completed by 04/17/2023 – Owen Willis
+
 “Develop fully-featured GUI” – Completed by 04/17/2023 – Tommy Eggers
+
 “Develop fully-featured GUI windows design” – Completed by 04/17/2023 – Libin Chen
+
 However, we might modify the responsibilities for each of our members when we are writing our program, or we might come together to work on the same part when we are facing challenging issues.
 
 In the event of conflicts, we would try to communicate with our team first to avoid any misunderstandings. We should focus on the problem, not the person, in any event of conflict. When conflicts arise, by focusing on the issue, the team can work together to find a solution. And if a conflict occurred, we would try to find the root of this issue, once the root cause of the conflict is identified, we could brainstorm possible solutions. This can involve considering different perspectives and finding common ground. If the conflict is too difficult to resolve by our team members, we would seek help from our professor and TAs of our class for outside intervenes.
