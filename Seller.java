@@ -4,8 +4,6 @@
 * Sellers will be able to create stores to sell their products and maintain relationships with customers. 
 * Users can create, edit, and delete accounts for themselves.
 * There should be an email and password associated with each account.
-* @version 1.0 2023/4/10
-* @author Libin Chen
 */
 public class Seller {
     private String username;
