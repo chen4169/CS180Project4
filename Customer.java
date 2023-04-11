@@ -97,35 +97,3 @@ public class Customer {
 
 }
 
-class Product {
-    private String storeID;
-    private String id;
-    private String name;
-    private String description;
-    private int quantity;
-    private double price;
-    private String seller;
-
-    public Product(String id, String name, String description, int quantity, double price, String seller) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.quantity = quantity;
-        this.price = price;
-        this.seller = seller;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public int getQuantity() {
-        return this.quantity;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s,%s,%s,%s,%s,%s", id, name, storeID, description, quantity, price);
-    }
-}
-
