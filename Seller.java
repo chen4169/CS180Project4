@@ -1,8 +1,11 @@
-package project4;
 /**
-*Sellers will be able to create stores to sell their products and maintain relationships with customers. 
+* A class with normal setter and getter methods used for creating seller object with information (username, password, id, name). 
+* It is like a seller account.
+* Sellers will be able to create stores to sell their products and maintain relationships with customers. 
 * Users can create, edit, and delete accounts for themselves.
 * There should be an email and password associated with each account.
+* @version 1.0 2023/4/10
+* @author Libin Chen
 */
 public class Seller {
     private String username;
