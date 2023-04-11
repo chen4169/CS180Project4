@@ -14,7 +14,9 @@ The only thing I would change if we were to start over again is time management.
 
 
 ### Jaime Rueda
-//individual writing
+For project four I took care of all the aspects that were necessary in order to create, connect and integrate a database into the project. The first step was to create the database that would be utilized. To create the database I used Microsoft access due to the integration through Ucanaccess that can be imported into IntelliJ. Once the file was created I created a table for each of the major components of the database which could be constituted as a table, this will allow us to determine what would be the characteristics of each of the classes. Once that is done I created the relationships between the tables in order to connect them and the main reason as to why we are using the database since we can filter the tables through the use of queries. Once the database was set up I integrated the database into Java through the Database class. This class when constructed will create a connection through Ucanaccess and allow java and the database to talk to one another. Furthermore, I was in charge of all of the SQL queries that are used within the code in order to facilitate all of the reading and searching within the information needed.
+If I were to start over againI probably would have avoided the integration of the Database since even though the utilization for it is of great use and convenience the integration has been a constant uphill battle with the system. Not only that but most of our errors seem to occur with the fact that the file for some reason is not letting other people get access even though there should not be any restrictions of use. At this point it probably would have been easier to deal with the limitations of the CSV files instead of all the problems that have been created with the integration of the database. For project 5 I believe we have two different options: either we resolve all of our issues with the database and continue down that path or probably restart integrating only the CSV files.
+
 
 ### Libin Chen
 //individual writing
