@@ -1,11 +1,33 @@
 # CS180 - Project 4 Report
 
 ## Part One: The Project and its Functionality
-For project 4 our team decided to go through with option three, which takes on the task of implementing the official marketplace of the application. The theme of the marketplace is that it will allow sellers to list their products and customers to purchase them. Explanation of the project will begin with the Seller and Customer classes. 
-The Seller class is straightforward. It initializes four fields, username, password, id, and name, along with their respective getters and setters, and a Seller object to create and update accounts and sign into the application. The implementation of the Seller class includes the display of the unique store, which includes products, descriptions, quantities, and prices. Through this implementation, the seller is given the ability to remove and add products, as well as view sales, and add a new store. 
-Next, is the Customer class, which is fairly like that of the Seller class. It initializes the same fields as the Seller class, including username, password, id, and name, but along with that it also initializes an array list to act as their shopping cart and to save products purchased. Implementation of the Customer class gives the customer the choice of four options, which include searching for products, choosing products, viewing their cart, or quitting the application. Necessary to the function of the array lists in the Customer class is the Product class, which represents that of a product and initializes the fields of storeID, id, name, description, quantity, price, and seller. All except storeID are included in the Product object, which is used for the general description of products accompanied by a toString() method for ease of display.
-Now, the Database class. First, we create a connection to the database through the use of UCanAccess by giving the URL of the database. UCanAccess is an “open-source Java JDBC driver implementation that allows Java developers and JDBC client programs (e.g., DBeaver, NetBeans, SQLeo, OpenOffice Base, LibreOffice Base, Squirrel SQL) to read/write Microsoft Access databases.” (https://ucanaccess.sourceforge.net/site.html) From there once the connection was made what needed to be done was to ask the connection to do certain actions, in the case of our project implementation, we only made SQL queries. Each query is set by a set of Keywords such as Insert into Delete and Select. Once the Query has run it will return the results of the said query in the specified order.
-	The final class of the project is the Market class, and it is by far the largest. Within the class, the main method is established. The main method starts with establishing who the user is and whether an account must be made for a new user. If a new account must be made, a series of questions follow, which allows the user to establish a username, name, password, and whether they would like a seller or customer account. If the user had an account, to begin with, they are instead prompted to input the password for their account. From here if the user is a customer, products and their details are printed, and following that is a series of choices the customer can take in deciding what they want to do (choices highlighted in the Customer class section above). If the user is instead a seller, their store(s) are displayed, and the following is, again, a series of choices that the seller can take to decide their next move in the application (choices highlighted in the Seller section above). The main method ends with a message of appreciation for the user.
+For project 4 our team decided to go through with option three, which takes on the task of implementing the official marketplace of the application. The
+theme of the marketplace is that it will allow sellers to list their products and customers to purchase them. Explanation of the project will begin with
+the Seller and Customer classes. 
+The Seller class is straightforward. It initializes four fields, username, password, id, and name, along with their respective getters and setters, and a
+Seller object to create and update accounts and sign into the application. The implementation of the Seller class includes the display of the unique store,
+which includes products, descriptions, quantities, and prices. Through this implementation, the seller is given the ability to remove and add products, as
+well as view sales, and add a new store. 
+Next, is the Customer class, which is fairly like that of the Seller class. It initializes the same fields as the Seller class, including username,
+password, id, and name, but along with that it also initializes an array list to act as their shopping cart and to save products purchased. Implementation
+of the Customer class gives the customer the choice of four options, which include searching for products, choosing products, viewing their cart, or
+quitting the application. Necessary to the function of the array lists in the Customer class is the Product class, which represents that of a product and
+initializes the fields of storeID, id, name, description, quantity, price, and seller. All except storeID are included in the Product object, which is used
+for the general description of products accompanied by a toString() method for ease of display.
+Now, the Database class. First, we create a connection to the database through the use of UCanAccess by giving the URL of the database. UCanAccess is an
+“open-source Java JDBC driver implementation that allows Java developers and JDBC client programs (e.g., DBeaver, NetBeans, SQLeo, OpenOffice Base,
+LibreOffice Base, Squirrel SQL) to read/write Microsoft Access databases.” (https://ucanaccess.sourceforge.net/site.html) From there once the connection
+was made what needed to be done was to ask the connection to do certain actions, in the case of our project implementation, we only made SQL queries. Each
+query is set by a set of Keywords such as Insert into Delete and Select. Once the Query has run it will return the results of the said query in the
+specified order.
+	The final class of the project is the Market class, and it is by far the largest. Within the class, the main method is established. The main method
+starts with establishing who the user is and whether an account must be made for a new user. If a new account must be made, a series of questions
+follow, which allows the user to establish a username, name, password, and whether they would like a seller or customer account. If the user had an
+account, to begin with, they are instead prompted to input the password for their account. From here if the user is a customer, products and their details
+are printed, and following that is a series of choices the customer can take in deciding what they want to do (choices highlighted in the Customer class
+section above). If the user is instead a seller, their store(s) are displayed, and the following is, again, a series of choices that the seller can take to
+decide their next move in the application (choices highlighted in the Seller section above). The main method ends with a message of appreciation for the
+user.
 
 
 ## Part Two: Individual Section
@@ -28,7 +50,22 @@ During the coding period, I suggested that we could create an abstract User clas
 
 
 ### Thomas Eggers
-//individual writing
+In terms of the coding aspect of Project 4, most of my contributions consisted of debugs of code within the classes, primarily the market class, and the
+development of error checks within the main method which would prevent the failure of the program/ application due to invalid input attempts. These error
+checks commonly consisted of do-while loops which would check the input and continue if it was valid. Aside from the coding aspects, I assisted in reaching
+out to the project group to establish some sort of fluid communication in the early stages of the project, and the proposal of a few in-person meeting
+times based on our individual scheduling conflicts and openings. Along with this I also wrote part 1 for our Project 4 report. This task asked me to
+describe the project and the functionality we implemented. To do so I queried some of the project team members about details of their specific
+implementations of code, along with doing some background research on an implementation such as UCanAccess, as used with the database. It required me to
+develop a somewhat deep interpretation of the project code and how it is connected to allow the program to run properly so that I could give a clear
+summary of what the implementations were. 
+In terms of what I would want to happen differently if we had done Project 4 again, it would primarily consist of getting an earlier start on the project
+and developing a clearer and more concise plan for executing our roles. Each member seemed to have a lot going on during the project, and the fact that we
+had not established full communication until a few days after the project release date gave us a disadvantage in getting a smooth start. By starting over
+the first step would be to meet in person as soon as possible and lay out a detailed plan for all members to execute within the aspect of coding that they
+work best in. This is exactly what I think we should consider for Project 5, and I think it will go a lot smoother since our communication is already
+established and that won’t be a problem.
+
 
 
 ## Part Three: Project 5 Collaboration Strategy
