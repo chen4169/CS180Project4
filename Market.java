@@ -13,14 +13,12 @@ public class Market {
         Seller seller = null;
         String username;
         String id;
-        boolean isCustomer = true;
+        boolean isCustomer = false;
+        String truePassword, name;
         boolean exists = true;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter filepath for the database that will be used:");
         String filepath = scanner.nextLine();
-
-        // FIXME -> Remove after testing
-        filepath = "C:\\Users\\owenw\\OneDrive\\Desktop\\CS 180\\Proj4\\src\\Database1.accdb";
         Database db = new Database(filepath);
         do {
             System.out.println("Enter Username (or 0 to create account):  ");
@@ -59,7 +57,7 @@ public class Market {
             System.out.println("Enter Password: ");
             String password = scanner.nextLine();
             System.out.println("Enter Name: ");
-            String name = scanner.nextLine();
+            name = scanner.nextLine();
 
 
             // Choosing account type
@@ -86,8 +84,6 @@ public class Market {
 
         }
         else {  // User has existing account
-            String truePassword = "";
-            String name = "";
             if (isCustomer) {
                 truePassword = String.valueOf(db.searchDB("Buyers.Buyer_Password", ("Buyers.Buyer_Username = \"" + username + "\"")));
                 id = String.valueOf(db.searchDB("Buyers.Id", ("Buyers.Buyer_Username = \"" + username + "\"")));
@@ -143,20 +139,13 @@ public class Market {
                     counter++;
                 }
 
-                do { //error checking in do-while loop
-                    System.out.println("What would you like to do?");
-                    System.out.println("(1) Search");
-                    System.out.println("(2) Choose Product");
-                    System.out.println("(3) View cart");
-                    System.out.println("(4) Quit");
-                    System.out.println("ENTER CHOICE: ");
-                    choice = scanner.nextLine();
-
-                    if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3") && !choice.equals("4")) {
-                        System.out.println("Error. Please enter a valid selection: 1, 2, 3, or 4.");
-                    }
-                } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3") && !choice.equals("4"));
-
+                System.out.println("What would you like to do?");
+                System.out.println("(1) Search");
+                System.out.println("(2) Choose Product");
+                System.out.println("(3) View cart");
+                System.out.println("(4) Quit");
+                System.out.println("ENTER CHOICE: ");
+                choice = scanner.nextLine();
 
                 if (choice.equals("1")) {  // SEARCHING
                     System.out.println("Search: ");
@@ -239,16 +228,10 @@ public class Market {
                         }
                     } while (!success);
 
-                    do { //do while error check
-                        System.out.println("(1) Add Item to Cart");
-                        System.out.println("(2) Purchase Item");
-                        System.out.println("(3) Quit");
-                        choice = scanner.nextLine();
-                        if (!choice.equals("1") && !choice.equals("2") && !choice.equals("3")) {
-                            System.out.println("Error. Please enter a valid selection: 1, 2, or 3.");
-                        }
-                    } while (!choice.equals("1") && !choice.equals("2") && !choice.equals("3"));
-
+                    System.out.println("(1) Add Item to Cart");
+                    System.out.println("(2) Purchase Item");
+                    System.out.println("(3) Quit");
+                    choice = scanner.nextLine();
 
                     if (choice.equals("1")) {  // Add to cart
                         customer.addToCart(product);
@@ -277,13 +260,13 @@ public class Market {
                 } else if (choice.equals("4")) {
                     ArrayList<String> results = db.searchDB("Products.Product_name, ", (" Buyers.Id = " + id + ";"));
                     System.out.println("What Item would you like to buy from: " + results);
-                    String productBuy = scanner.nextLine();
+                    String produtcBuy = scanner.nextLine();
                     System.out.println("How many items would you like to buy");
                     int numberProducts = scanner.nextInt();
                     scanner.nextLine();
-                    int Availability = Integer.parseInt(String.valueOf(db.searchDB("Products.Quantity_available", ("Products.Product_name = \"" + productBuy + "\", Buyers.Id = \"" + id + "\";"))));
+                    int Availability = Integer.parseInt(String.valueOf(db.searchDB("Products.Quantity_available", ("Products.Product_name = \"" + produtcBuy + "\", Buyers.Id = \"" + id + "\";"))));
                     if (numberProducts <= Availability) {
-                        String productID = String.valueOf(db.searchDB("Products.Product_ID", ("Products.Product_name = \"" + productBuy + "\", Buyers.Id = \"" + id + "\";")));
+                        String productID = String.valueOf(db.searchDB("Products.Product_ID", ("Products.Product_name = \"" + produtcBuy + "\", Buyers.Id = \"" + id + "\";")));
                         db.Update("Products", ("" + (Availability - numberProducts)), productID);
                         System.out.println("Product bought.");
                     } else {
@@ -294,55 +277,45 @@ public class Market {
             }
 
         } else {  // seller interface
-            
-            id = seller.getId();
-            while (true) {
-                int prodCounter = 1;
-                ArrayList<String> products = db.searchDB("Products.Product_name, Products.Product_description, Markets.Store_name, Products.Price, Products.Quantity_available", ("Buyers.Id = \"" + id + "\";"));
-                String[] tempProd = new String[6]; // indexing mentioned above
 
-                for (String product : products) {
-                    System.out.printf("=============={Prod #: %d}==============\n", prodCounter);
-                    tempProd = product.split(",");
-                    System.out.println("Store" + tempProd[2]);
-                    System.out.println("Product: " + tempProd[0]);
-                    System.out.println("Description: " + tempProd[1]);
-                    System.out.println("Quantity: " + tempProd[4]);
-                    System.out.println("Price: $" + tempProd[3]);
+            while (true) {
+                int storeCounter = 1;
+                ArrayList<String> stores = db.searchDB("Markets.Store_name",("Buyers.Id = \"" + id + "\";"));
+                for (String store : stores) {
+                    System.out.printf("[%d]  STORE NAME\n", storeCounter);
+                    ArrayList<String> products = db.searchDB("Products.Product_name, Products.Product_description, Markets.Store_name, Products.Price, Products.Quantity_available", ("Buyers.Id = \"" + id + "\";"));
+                    String[] tempProd = new String[6]; // indexing mentioned above
+
+                    for (String product : products) {
+                        tempProd = product.split(",");
+                        System.out.println("Store" + tempProd[2]);
+                        System.out.println("Product: " + tempProd[0]);
+                        System.out.println("Description: " + tempProd[1]);
+                        System.out.println("Quantity: " + tempProd[4]);
+                        System.out.println("Price: $" + tempProd[3]);
+                    }
+                    storeCounter++;
                 }
 
-
-                String sellerChoice;
-                do {
-                    System.out.println("What would you like to do?");
-                    System.out.println("(1) Remove Products");
-                    System.out.println("(2) Add Products");
-                    System.out.println("(3) View Sales");
-                    System.out.println("(4) Add Store");
-                    System.out.println("(5) Quit");
-                    System.out.println("Enter Choice: ");
-                    sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
-
-                    if (!sellerChoice.equals("1") && !sellerChoice.equals("2") && !sellerChoice.equals("3") &&
-                            !sellerChoice.equals("4") && !sellerChoice.equals("5")) {
-                        System.out.println("Error. Please enter a valid selection: 1, 2, 3, or 4.");
-                    }
-                } while (!sellerChoice.equals("1") && !sellerChoice.equals("2") && !sellerChoice.equals("3") &&
-                        !sellerChoice.equals("4") && !sellerChoice.equals("5")); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
+                System.out.println("What would you like to do?");
+                System.out.println("(1) Remove Products");
+                System.out.println("(2) Add Products");
+                System.out.println("(3) View Sales");
+                System.out.println("(4) Quit");
+                System.out.println("Enter Choice: ");
+                String sellerChoice = scanner.nextLine().strip(); // AGAiN COULD DO_WHILE TO ERROR CHECK (MAYBE WASTE OF TIME FOR GUI)
 
                 if (sellerChoice.equals("1")) { // remove products
-                    /*
                     System.out.println("Pick a store to remove product from (enter # associated w/ store): ");
                     int storeIndex = scanner.nextInt() - 1; // no error check
                     scanner.nextLine();
                     String[] store = new String[3];
-
+                    store = stores.get(storeIndex).split(",");
                     int storeId = Integer.parseInt(store[0]);
 
 
                     int prodCounter = 1;
                     ArrayList<String> storeProducts = db.searchDB("Products.Product_name, Products.Product_description, Products.Price, Products.Quantity_available, Markets.Store_name", ("Markets.Store_ID = \"" + storeId + "\";")); // Get products attached to the store id
-                    store = storeProducts.get(storeIndex).split(",");
                     for (String strProd: storeProducts) {
                         System.out.printf("---------[%d]---------\n", prodCounter);
                         String[] tempProd = new String[6]; // indexing mentioned above
@@ -354,84 +327,37 @@ public class Market {
                         System.out.println("Price: $" + tempProd[2]);
                         prodCounter++;
                     }
-                     */
 
                     System.out.println("Enter Number associated with product you want to remove: ");
                     int removeIndex = scanner.nextInt() - 1;
                     scanner.nextLine();
-                    int removeID = Integer.parseInt(products.get(removeIndex).split(",")[0]);
-                    db.delete("Markets", ("Markets.Store_ID = " + removeID));  
+                    int removeID = Integer.parseInt(storeProducts.get(removeIndex).split(",")[0]);
+                    db.delete("Markets", ("Markets.Store_ID = " + removeID));
 
                 } else if (sellerChoice.equals("2")) { // add item
-
-                    ArrayList<String> storeNames = db.searchDB("Markets.Store_name, Markets.Store_ID", ("Buyers.Id = \"" + id + "\";"));  // FIXME -> Will this work?
-
-                    int storeCounter = 1;
-                    for (String s: storeNames) {
-                        System.out.printf("=============={Store #: %d}==============\\n\"", storeCounter);
-                        System.out.println(s.split(",")[0]);
-                        storeCounter++;
-                    }
-
-                    System.out.println("Pick a store to add product to (enter # corresponding to): ");
-                    int storeIndex = scanner.nextInt() - 1;
+                    System.out.println("Pick a store to add product to (enter # associated w/ store): ");
+                    int storeIndex = scanner.nextInt() - 1; // no error check
                     scanner.nextLine();
-
-                    String[] chosenStore = storeNames.get(storeIndex).split(",");
-                    int storeID = Integer.parseInt(chosenStore[1]); // no error check
+                    String[] store = new String[3];
+                    store = stores.get(storeIndex).split(",");
+                    int storeId = Integer.parseInt(store[0]);
 
                     System.out.println("Enter Product Name: ");
-                    String name = scanner.nextLine();
+                    name = scanner.nextLine();
                     System.out.println("Enter Product Description: ");
                     String desc = scanner.nextLine();
                     System.out.println("Enter Quantity Available: ");
                     int quant = scanner.nextInt();
                     scanner.nextLine();
-                    System.out.print("Enter Price: $");
+                    System.out.println("Enter Price");
                     int price = scanner.nextInt();
                     scanner.nextLine();
 
-                    db.addProduct(name, storeID, desc, quant, price);
+                    db.addProduct(name, storeIndex, desc, quant, price);
 
-                } else if (sellerChoice.equals("3")) { // checking sales by store
+                } else if (sellerChoice.equals("3")) { // checking sales
                     // FIXME - SHOULD READ FROM THE USER PURCHASE HISTORY AND MATCH STUFF FROM SELLER OWNED STORES
-                    double entireRev = 0;
 
-                    // FIXME -> Will this work?
-                    ArrayList<String> stores = db.searchDB("Markets.Store_name, Markets.Store_ID",
-                            ("Buyers.Id = \"" + id + "\";"));
-
-                    for (String s: stores) {
-                        String[] store = s.split(",");
-                        String sid = store[1]; // store id
-                        System.out.println("SALES FOR: " + store[0]); // store's name
-
-                        double totalRev = 0;
-                        // FIXME -> Will this work?
-                        ArrayList<String> storeProducts = db.searchDB("Products.Product_ID, Products.Product_name", ("Products.Store_ID = \"" + sid + "\";"));;  // Use store ID And name to display sales by store
-
-                        for (String prod: storeProducts) {
-                            tempProd = prod.split(",");
-                            ArrayList<String> purchases = new ArrayList<>(); // FIXME -> NEEDS TO BE ADDED TO THE DATABASE - should find all the user purchase
-                            for (String p: purchases) {
-                                String[] pur = p.split(",");  // INDEXING: 0 = product ID, 1 = buyer ID, 2 = buyer username, 3 = store ID, 4 = quantity, 5 = price, 6 = product name
-
-                                totalRev += Double.parseDouble(pur[3]) * Double.parseDouble(pur[4]);
-                                System.out.printf("\t%s Purchased %s of %s\n", pur[2], pur[4], tempProd[1]);
-                            }
-                        }
-                        System.out.printf("Total Revenue for %s: %.2f\n\n", store[0], totalRev);
-                        entireRev += totalRev;
-                    }
-                    System.out.printf("Overall Seller Revenue: %.2f\n\n", entireRev);
-
-                } else if (sellerChoice.equals("4")) {
-                    // TODO: Check this is correct
-                    System.out.println("Enter Name of store: ");
-                    String newStoreName = scanner.nextLine();
-
-                    // FIXME -> Will this work?
-                    db.addMarket(newStoreName, Integer.parseInt(seller.getId()));
                 } else { // anything else quits the loop
                     break;
                 }
