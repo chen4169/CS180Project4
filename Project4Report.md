@@ -6,6 +6,11 @@ theme of the marketplace is that it will allow sellers to list their products an
 
 (my thoughts are we explain the separate classes first, and then tie them in with how the main method goes about connecting everything)
 
+How the database is integrated:
+First we create a connection to the database through the use of Ucanaccess by giving the url of the database. For details on Ucanaccess https://ucanaccess.sourceforge.net/site.html 
+From there once the connection was made what needed to be done was to ask the connection to do certain actions in this case we only made SQL queries.
+Each query is set by a set of Keywords such as Insert Into Delete and Select.
+Once the Query has run it will return the results of such query in the specified order.
 
 
 ## Part Two: Individual Section
