@@ -24,7 +24,7 @@ public class Market {
         boolean exists = true;
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter filepath for the database that will be used:");
+        System.out.println("Enter filepath for the database that will be used:(for this beta test, you must modify file path inside the Database class!)");
         String filepath = scanner.nextLine();
 
         // create the connection to the database
