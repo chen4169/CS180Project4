@@ -1,7 +1,9 @@
 # CS180Project4
 1.
 Project 4 of CS 180 class
-Please take into account that the filepath needed for the database must be the complete filepath of where the database is downloaded from and must not contain the initial and final forward slash ("/").
+Please take into account that the filepath needed for the database must be the complete filepath of where the database is downloaded from and must not contain the initial and final forward slash ("//"). For example (//C://Users//path1//path2//paht3//Database1.accdb)
+
+To install the environment to run the database code, one must download the libs file, then create a new Directory in the project file, copy the files in the libs and paste them into the libs. Next, click "File" on the corner, click "Project Structure" go to "Libraries", clikc "+" to add New Project Library, select "Java", find the libs file just downloaded, click "Ok", that is. Now you can run the databese codes.
 
 2.
 Tommy -Submitted Report on Brightspace
