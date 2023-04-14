@@ -1,3 +1,77 @@
+package Project5;
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
 /**
-* This is the Server class that will create connection and interact with the database.
-*/
+ * This is the Server class that will create connection and interact with the database.
+ * This is a simple version that show how this class can be written for now.
+ * @Version 2023/4/13 1.0
+ * @author Libin Chen
+ */
+public class Server {
+    private static String dataBasePath =
+            "jdbc:ucanaccess://C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
+    private static int port = 4242;
+    private static Database db;
+
+    public static void main(String[] args) throws IOException {
+
+        // create a new Database instance
+        db = new Database(dataBasePath);
+
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("Waiting for clients to connect...");
+
+        while (true) {
+            Socket socket = serverSocket.accept();
+            System.out.println("Client connected!");
+            // create a new thread to handle client requests
+            new Thread(new ClientHandler(socket)).start();
+        }
+
+    }
+
+    private static class ClientHandler implements Runnable {
+        private Socket socket;
+        private BufferedReader in;
+        private PrintWriter out;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            try {
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
+
+                String request;
+                while ((request = in.readLine()) != null) {
+                    if (request.equals("getProductList")) {
+                        // handle request from CustomerClient for list of products
+                        String productList = "Apple, Banana, Lemon";
+                        out.println("Product list: " + productList);
+                    }
+                    else if (request.equals("updateProductQuantity")) {
+                        // handle request from CustomerClient to update product quantity
+
+                    } else if (request.equals("updateProductPrice")) {
+                        // handle request from SellerClient to update product price
+
+                    } // you might create more else if here........
+
+                } // while loop
+
+            } catch (IOException e) {
+                System.out.println("Error handling client request: " + e);
+            } finally { // ensure the socket is closed regardless of whether an exception is thrown
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing socket: " + e);
+                }
+            }
+        }
+    }
+}
+
