@@ -1,6 +1,12 @@
-package project4;
+package Project5;
 import java.sql.*;
 import java.util.ArrayList;
+/**
+ * This class contains the methods to interact with the database file
+ * Only the Server will use these methods
+ * @Version 2023/4/15 1.0
+ * @author Libin Chen
+ */
 
 /**
  * Important: the file path 'url' must be in the form 'jdbc:ucanaccess://C://path1//path2//path3//path4//Database1.accdb'
@@ -10,15 +16,41 @@ public class Database {
     private String sellerCounter;
     private String buyerCounter;
 
+    /**
+     * This method will create the connection with the database file by using filepath
+     * @param filepath A string represent the file path of the database file
+     */
     public Database(String filepath) {
-        //String url = "jdbc:ucanaccess:" + filepath;
-        // Now is for test only, modify the below url to the file path in this format, else, it won't work.
-        String url = "jdbc:ucanaccess://C://Users//Libin//IdeaProjects//CS18000//Database1.accdb";
+        String url = "jdbc:ucanaccess://" + filepath;
         try {
             this.con = DriverManager.getConnection(url);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * This method will search Sellers and Buyers table in the database
+     * and return a string of all the information asociated with the username
+     * @param username the username of an account
+     * @return A string that contains all the information of an acccount
+     */
+    public String getUserData(String username) {
+        String query = "SELECT * FROM Buyers WHERE Buyer_Username = ? UNION SELECT * FROM Sellers WHERE Seller_Username = ?";
+        try {
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, username);
+            pstmt.setString(2, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String userType = rs.getString(2).startsWith("B") ? "C" : "S";
+                return userType + rs.getInt(1) + "," + rs.getString(2) + "," + rs.getString(3) + "," + rs.getString(4);
+            }
+        } catch (SQLException e) {
+            System.out.println("An error occurred while getting user data: " + e.getMessage());
+            return "";
+        }
+        return "";
     }
 
     public String searchBuyerData(String username) {
