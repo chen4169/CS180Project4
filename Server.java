@@ -5,12 +5,12 @@ import java.util.ArrayList;
 /**
  * This is the Server class that will create connection and interact with the database.
  * This is a simple version that show how this class can be written for now.
- * @Version 2023/4/13 1.0
+ * @Version 2023/4/15 1.1
  * @author Libin Chen
  */
 public class Server {
     private static String dataBasePath =
-            "jdbc:ucanaccess://C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
+            "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
     private static int port = 4242;
     private static Database db;
 
@@ -47,10 +47,12 @@ public class Server {
 
                 String request;
                 while ((request = in.readLine()) != null) {
-                    if (request.equals("getProductList")) {
-                        // handle request from CustomerClient for list of products
-                        String productList = "Apple, Banana, Lemon";
-                        out.println("Product list: " + productList);
+                    if (request.substring(0, 2).equals("01")) {
+                        System.out.println("Processing getUserData...");
+                        // handle request from Marketplace to check username
+                        String username = request.substring(2);
+                        String response = db.getUserData(username);
+                        out.println(response);
                     }
                     else if (request.equals("updateProductQuantity")) {
                         // handle request from CustomerClient to update product quantity
