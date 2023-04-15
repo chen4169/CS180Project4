@@ -8,33 +8,42 @@ import javax.swing.JOptionPane;
 /**
  * This is a client class that provides the interface for a customer to exchange information with the server.
  * This is a simple version that show how this class can be written for now.
- * @Version 2023/4/13 1.0
+ * @Version 2023/4/15 1.1
  * @author Libin Chen
  */
 public class CustomerClient {
-    private static String serverAddress = "localhost";
-    private static int port = 4242;
+    private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
+    private Database database;
+    private Socket socket;
+    private int userID;
+    private String username;
+    private String password;
+    private String trueName;
 
-    public static void main(String[] args) throws IOException {
+    /**
+     * The userData will  be a string like "1,SellerTest1@gmail,123456,SellerTest1"
+     */
+    public CustomerClient(Database database, Socket socket, String userData) {
+        this.database = database;
+        this.socket = socket;
+        String[] userDataArray = userData.split(",");
+        this.userID = Integer.parseInt(userDataArray[0]);
+        this.username = userDataArray[1];
+        this.password = userDataArray[2];
+        this.trueName = userDataArray[3];
+    }
 
-        // create connection with the Server
-        Socket socket = new Socket(serverAddress, port);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    public void start() {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+            // you might continue to build the program below
 
-        // send the request to the server
-        String request = "getProductList";
-        out.println(request);
-        out.flush(); // ensures that data is sent to the server immediately
+            JOptionPane.showMessageDialog(null, "Welcome! Dear customer " + username + "!");
+            JOptionPane.showMessageDialog(null, goodbyeMessage);
 
-        // get the response from the server
-        String response = in.readLine();
-
-        // print it out with GUI interface
-        JOptionPane.showMessageDialog(null, "Product List: " + response);
-
-        // close socket
-        socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
