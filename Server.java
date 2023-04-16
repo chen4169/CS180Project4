@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * This is the Server class that will create connection and interact with the database.
  * This is a simple version that show how this class can be written for now.
- * @Version 2023/4/15 1.1
+ * @Version 2023/4/16 1.2
  * @author Libin Chen
  */
 public class Server {
@@ -54,10 +54,14 @@ public class Server {
                         String response = db.getUserData(username);
                         out.println(response);
                     }
-                    else if (request.equals("updateProductQuantity")) {
-                        // handle request from CustomerClient to update product quantity
-
-                    } else if (request.equals("updateProductPrice")) {
+                    else if (request.substring(0, 2).equals("02")) {
+                        System.out.println("Processing addUserData...");
+                        // handle request from Marketplace to add new user data
+                        String userData = request.substring(2); // remove "02"
+                        String response = db.addUserData(userData); // pass the user data as a single input string to the addUserData method
+                        out.println(response);
+                    }
+                    else if (request.equals("updateProductPrice")) {
                         // handle request from SellerClient to update product price
 
                     } // you might create more else if here........
