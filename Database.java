@@ -4,7 +4,7 @@ import java.util.ArrayList;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
- * @Version 2023/4/15 1.0
+ * @Version 2023/4/16 1.1
  * @author Libin Chen
  */
 
@@ -43,7 +43,7 @@ public class Database {
             pstmt.setString(2, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                String userType = rs.getString(2).startsWith("B") ? "S" : "C";
+                String userType = rs.getString(2).startsWith("B") ? "C" : "S";
                 return userType + rs.getInt(1) + "," + rs.getString(2) + "," + rs.getString(3) + "," + rs.getString(4);
             }
         } catch (SQLException e) {
@@ -51,6 +51,43 @@ public class Database {
             return "";
         }
         return "";
+    }
+
+    /**
+     * This method will add new user information to the database file by
+     * taking a string leading by "S" or "C" and separated by a ","
+     * @param request a string like "Susername,password,trueName" or "Cusername,password,trueName"
+     * @return a String message
+     */
+    public String addUserData(String request) {
+        String[] userData = request.split(",");
+        String userType = userData[0].substring(0, 1);
+        String username = userData[0].substring(1);
+        String password = userData[1];
+        String trueName = userData[2];
+
+        try {
+            Statement stmt = con.createStatement();
+            String query;
+            if (userType.equals("S")) {
+                query = "INSERT INTO Sellers (Seller_Username, Seller_Password, Seller_Name) " +
+                        "VALUES ('" + username + "', '" + password + "', '" + trueName + "')";
+            } else if (userType.equals("C")) {
+                query = "INSERT INTO Buyers (Buyer_Username, Buyer_Password, Buyer_Name) " +
+                        "VALUES ('" + username + "', '" + password + "', '" + trueName + "')";
+            } else {
+                return "Invalid user type";
+            }
+            int numRows = stmt.executeUpdate(query);
+            if (numRows > 0) {
+                return "User data added successfully";
+            } else {
+                return "Failed to add user data";
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            return "Failed to add user data";
+        }
     }
 
     public String searchBuyerData(String username) {
