@@ -13,7 +13,7 @@ import java.net.Socket;
 /**
  * This is the entry of the program, it will determine the user type and
  * pass the Database object and the Server connection to whether CustomerClient or SellerClient
- * @version 1.2 2020/4/16
+ * @version 1.2 2020/4/21
  * @author Libin Chen
  */
 public class Marketplace {
@@ -100,11 +100,11 @@ public class Marketplace {
                 JOptionPane.showMessageDialog(null, "Username: " + response);
                 if (response.startsWith("S")) {
                     // response starts with "S"
-                    //SellerClient client = new SellerClient(db, socket, response.substring(1)); // pass the account information accordingly
+                    //SellerClient client = new SellerClient(socket, response.substring(1)); // pass the account information accordingly
                     //client.start(); // start the client
                 } else if (response.startsWith("C")) {
                     // response starts with "C"
-                    CustomerClient client = new CustomerClient(db, socket, response.substring(1)); // pass the account information accordingly
+                    CustomerClient client = new CustomerClient(socket, response.substring(1)); // pass the account information accordingly
                     client.start(); // start the client
                 }
                 break;
