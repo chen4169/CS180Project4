@@ -1,10 +1,11 @@
 package Project5;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
- * @Version 2023/4/16 1.1
+ * @Version 2023/4/23 1.2
  * @author Libin Chen
  */
 
@@ -89,6 +90,40 @@ public class Database {
             return "Failed to add user data";
         }
     }
+
+    /**
+     * This method will search the purchase history of a certain costomer by the ID
+     * and return a string array contains "OrderID,Product_ID,Product_Name,Store_ID,Store_Name,Buyer_ID,Quantity,Product_Price"
+     * separated by a ","
+     * @param buyerID the ID of the Customer to be searched
+     * @return a string array contains the desired information
+     * @throws SQLException the call function need to handle this exception
+     */
+    public String[] searchPurchaseHistoryByBuyerID(int buyerID) {
+        ArrayList<String> purchaseHistoryList = new ArrayList<>();
+        try {
+            Statement stmt = con.createStatement();
+            String query = "SELECT * FROM PurchaseHistory WHERE Buyer_ID=" + buyerID;
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                int orderID = rs.getInt("OrderID");
+                int productID = rs.getInt("Product_ID");
+                String productName = rs.getString("Product_Name");
+                int storeID = rs.getInt("Store_ID");
+                String storeName = rs.getString("Store_Name");
+                int quantity = rs.getInt("Quantity");
+                double price = rs.getDouble("Product_Price");
+                String row = orderID + "," + productID + "," + productName + "," + storeID + "," + storeName + "," + buyerID + "," + quantity + "," + price;
+                purchaseHistoryList.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        String[] purchaseHistory = new String[purchaseHistoryList.size()];
+        return purchaseHistoryList.toArray(purchaseHistory);
+    }
+
+
 
     public String searchBuyerData(String username) {
         String buyerInfo = "";
