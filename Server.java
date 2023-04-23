@@ -1,167 +1,120 @@
 package Project5;
-
-import javax.swing.JOptionPane;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-
+import javax.swing.*;
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
 /**
- * This is the entry of the program, it will determine the user type and
- * pass the Database object and the Server connection to whether CustomerClient or SellerClient
- * @version 1.3 2020/4/23
+ * This is the Server class that will create connection and interact with the database.
+ * This is a simple version that show how this class can be written for now.
+ * @Version 2023/4/23 1.3
  * @author Libin Chen
  */
-public class Marketplace {
-    private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
-    private static String getUserData = "01"; //command index to tell the Server to get user data
-    private static String addUserData = "02"; //command index to tell the Server to add user data
+public class Server {
+    private static String getUserData = "01"; //command index to get user data
+    private static String addUserData = "02"; //command index to add user data
+    private static String searchPurchaseHistoryByBuyerID = "03"; //command index to search purchase history of a customer
 
     private static String dataBasePath =
             "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
-    private static String hostName = "localhost";
     private static int port = 4242;
+    private static Database db;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        // create a connection to the server
-        try (Socket socket = new Socket(hostName, port)) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-            // show a message dialog if the connection is successful
-            JOptionPane.showMessageDialog(null, "Successfully connected to the server!");
-
-            // ask users if they want to sign up or log in
-            int choice = JOptionPane.showOptionDialog(null, "Choose an option:", "Marketplace Entry",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                    new Object[] {"Sign up", "Log in"}, "Log in");
-            if (choice == JOptionPane.YES_OPTION) {
-                // handle Sign up button clicked
-                boolean success = signup(in, out, socket);
-                if (!success) {
+        boolean isValidPath = false;
+        while (!isValidPath) {
+            if (dataBasePath.equals("")) { // if the database address is empty
+                dataBasePath = JOptionPane.showInputDialog(null, "Enter the database path", "Marketplace initialization",
+                        JOptionPane.QUESTION_MESSAGE);
+                if (dataBasePath == null) { // if the user click the cross sign "x", end the program
+                    JOptionPane.showMessageDialog(null, "Program terminated.");
                     return;
                 }
-                login(in, out, socket);
-            } else if (choice == JOptionPane.NO_OPTION) {
-                // handle Log in button clicked
-                login(in, out, socket);
+            }
+
+            // check if the database file exists
+            File file = new File(dataBasePath);
+            if (file.exists() && !file.isDirectory()) {
+                isValidPath = true;
             } else {
-                JOptionPane.showMessageDialog(null, goodbyeMessage);
-                return;
+                JOptionPane.showMessageDialog(null, "Invalid database path. Please enter a valid path.");
+                dataBasePath = "";
             }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error connecting to the server: " + e.getMessage());
-            }
-    }
 
-    public static boolean login(BufferedReader in, PrintWriter out, Socket socket) throws IOException {
+        }
+
+        try {
+            // create a new Database instance
+            db = new Database(dataBasePath);
+        } catch (RuntimeException e) {
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage() + ". Program terminated.");
+            return;
+        }
+
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("Waiting for clients to connect...");
+
         while (true) {
-            // ask the user for their username
-            String username = JOptionPane.showInputDialog(null, "Enter your username", "Marketplace Login",
-                    JOptionPane.QUESTION_MESSAGE);
-            if (username == null) { // if the user click the cross sign "x", end the program
-                JOptionPane.showMessageDialog(null, goodbyeMessage);
-                return false;
-            }
-            // send the username to the server with a leading command index
-            out.println(getUserData + username);
+            Socket socket = serverSocket.accept();
+            System.out.println("Client connected!");
+            // create a new thread to handle client requests
+            new Thread(new ClientHandler(socket)).start();
+        }
 
-            // get the username returned
-            String response = in.readLine(); // it will be a string separated by "," and leading by "S" or "C"
-            // S means Seller, C means Customer, for example: "S1,SellerTest1@gmail,123456,SellerTest1"
-
-            // print it out with GUI interface
-            if (response.equals("")) { // if no account found
-                int choice = JOptionPane.showConfirmDialog(null,
-                        "Account not found. Do you want to try again?",
-                        "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                if (choice == JOptionPane.NO_OPTION || choice == JOptionPane.CLOSED_OPTION) {
-                    // if the user want to leave
-                    JOptionPane.showMessageDialog(null, goodbyeMessage);
-                    return false;
-                }
-            } else { // if there is an account matched
-                JOptionPane.showMessageDialog(null, "Username: " + response);
-                if (response.startsWith("S")) {
-                    // response starts with "S"
-                    //SellerClient client = new SellerClient(socket, response.substring(1)); // pass the account information accordingly
-                    //client.start(); // start the client
-                } else if (response.startsWith("C")) {
-                    // response starts with "C"
-                    CustomerClient client = new CustomerClient(socket, response.substring(1)); // pass the account information accordingly
-                    client.start(); // start the client
-                }
-                break;
-            }
-        } // while loop end
-        return true;
     }
 
-    public static boolean signup(BufferedReader in, PrintWriter out, Socket socket) throws IOException {
-        String username = JOptionPane.showInputDialog(null, "Enter your username", "Marketplace Signup",
-                JOptionPane.QUESTION_MESSAGE);
-        if (username == null) { // if the user click the "cancel" button or the input is null
-            JOptionPane.showMessageDialog(null, goodbyeMessage);
-            return false;
+    private static class ClientHandler implements Runnable {
+        private Socket socket;
+        private BufferedReader in;
+        private PrintWriter out;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
         }
 
-        // send the username to the server with a leading command index
-        out.println(getUserData + username);
+        public void run() {
+            try {
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
 
-        // get the username returned
-        String response = in.readLine(); // it will be a string separated by "," and leading by "S" or "C"
-        // S means Seller, C means Customer, for example: "S1,SellerTest1@gmail,123456,SellerTest1"
+                String request;
+                while ((request = in.readLine()) != null) {
+                    if (request.substring(0, 2).equals(getUserData)) {
+                        System.out.println("Processing getUserData...");
+                        // handle request from Marketplace to check username
+                        String username = request.substring(2);
+                        String response = db.getUserData(username);
+                        out.println(response);
+                    }
+                    else if (request.substring(0, 2).equals(addUserData)) {
+                        System.out.println("Processing addUserData...");
+                        // handle request from Marketplace to add new user data
+                        String userData = request.substring(2); // remove "02"
+                        String response = db.addUserData(userData); // pass the user data as a single input string to the addUserData method
+                        out.println(response);
+                    } else if (request.substring(0, 2).equals(searchPurchaseHistoryByBuyerID)) {
+                        System.out.println("Processing searchPurchaseHistoryByBuyerID...");
+                        // handle request from CustomerClient to search purchase history
+                        int customerID = Integer.parseInt(request.substring(2)); // remove "03"
+                        String[] purchaseHistory = db.searchPurchaseHistoryByBuyerID(customerID); // retrieve purchase history from the database
+                        String historyString = String.join("@", purchaseHistory); // convert to a string separated by @
+                        out.println(historyString); // sent the string to client
+                        out.flush(); // ensure that all data is sent immediately
+                        // historyString example: "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
+                    } // you might create more else if here........
 
-        while (!response.equals("")) { // if the username has been taken, let the user to try another username
-            JOptionPane.showMessageDialog(null, "This username has already been taken. Please try another one.");
-            username = JOptionPane.showInputDialog(null, "Enter your username", "Marketplace Signup",
-                    JOptionPane.QUESTION_MESSAGE);
-            if (username == null) { // if the user click the "cancel" button or the input is null
-                JOptionPane.showMessageDialog(null, goodbyeMessage);
-                return false;
+                } // while loop
+
+            } catch (IOException e) {
+                System.out.println("Error handling client request: " + e);
+            } finally { // ensure the socket is closed regardless of whether an exception is thrown
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing socket: " + e);
+                }
             }
-            out.println(getUserData + username);
-            response = in.readLine();
         }
-
-        // if the username is available, ask for password and trueName
-        String password = JOptionPane.showInputDialog(null, "Enter your password", "Marketplace Signup",
-                JOptionPane.QUESTION_MESSAGE);
-        if (password == null) { // if the user click the "cancel" button or the input is null
-            JOptionPane.showMessageDialog(null, goodbyeMessage);
-            return false;
-        }
-        String trueName = JOptionPane.showInputDialog(null, "Enter your full name", "Marketplace Signup",
-                JOptionPane.QUESTION_MESSAGE);
-        if (trueName == null) { // if the user click the "cancel" button or the input is null
-            JOptionPane.showMessageDialog(null, goodbyeMessage);
-            return false;
-        }
-        String data = username + "," + password + "," + trueName;
-
-        // ask the user to choose Customer or Seller
-        Object[] options = {"Customer", "Seller"};
-        int choice = JOptionPane.showOptionDialog(null, "Are you a Customer or a Seller?", "Marketplace Signup",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        if (choice == JOptionPane.CLOSED_OPTION) { // if the user click the "cancel" button or the input is null
-            JOptionPane.showMessageDialog(null, goodbyeMessage);
-            return false;
-        } else if (choice == JOptionPane.YES_OPTION) { // if the user chooses Customer
-            out.println(addUserData + "C" + data); // "02C,username,password,trueName"
-            response = in.readLine();
-            JOptionPane.showMessageDialog(null, response);
-        } else if (choice == JOptionPane.NO_OPTION) { // if the user chooses Seller
-            out.println(addUserData + "S" + data);
-            response = in.readLine();
-            JOptionPane.showMessageDialog(null, response);
-        }
-        return true;
     }
-
 }
 
