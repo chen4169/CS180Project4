@@ -13,7 +13,7 @@ import java.net.Socket;
 /**
  * This is the entry of the program, it will determine the user type and
  * pass the Database object and the Server connection to whether CustomerClient or SellerClient
- * @version 1.2 2020/4/21
+ * @version 1.3 2020/4/23
  * @author Libin Chen
  */
 public class Marketplace {
@@ -25,19 +25,8 @@ public class Marketplace {
             "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
     private static String hostName = "localhost";
     private static int port = 4242;
-    private static Database db;
 
     public static void main(String[] args) {
-        // create a new Database instance
-        if (dataBasePath.equals("")) { // if the database address is empty
-            dataBasePath = JOptionPane.showInputDialog(null, "Enter the database path", "Marketplace initialization",
-                    JOptionPane.QUESTION_MESSAGE);
-            if (dataBasePath == null) { // if the user click the cross sign "x", end the program
-                JOptionPane.showMessageDialog(null, goodbyeMessage);
-                return;
-            }
-        }
-        db = new Database(dataBasePath);
 
         // create a connection to the server
         try (Socket socket = new Socket(hostName, port)) {
