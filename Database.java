@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
- * @Version 2023/4/23 1.2
+ * @Version 2023/4/24 1.3
  * @author Libin Chen
  */
 
@@ -126,6 +126,48 @@ public class Database {
         return purchaseHistory;
     }
 
+    /**
+     * This method will take a string to search any product that contains this string
+     * and return them as an ArrayList in which each element is separated by a ","
+     * @param searchWord the word used for searching matched products
+     * @return an ArrayList that contains the matched result
+     */
+    public ArrayList<String> searchProducts(String searchWord) {
+        ArrayList<String> result = new ArrayList<>();
+
+        try {
+            // create the SQL statement
+            String query = "SELECT * FROM Products WHERE LOWER(Product_name) LIKE LOWER(?) OR LOWER(Product_description) LIKE LOWER(?)";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            // set the search keyword for the prepared statement
+            ps.setString(1, "%" + searchWord.toLowerCase() + "%");
+            ps.setString(2, "%" + searchWord.toLowerCase() + "%");
+
+            // execute the query and get the results
+            ResultSet rs = ps.executeQuery();
+
+            // iterate through the results and add them to the result ArrayList
+            while (rs.next()) {
+                String productID = Integer.toString(rs.getInt("Product_ID"));
+                String productName = rs.getString("Product_name");
+                String storeID = Integer.toString(rs.getInt("Store_ID"));
+                String productDescription = rs.getString("Product_description");
+                String quantityAvailable = Integer.toString(rs.getInt("Quantity_available"));
+                String price = Double.toString(rs.getDouble("Price"));
+
+                result.add(productID + "," + productName + "," + storeID + "," + productDescription + "," + quantityAvailable + "," + price);
+            }
+
+        } catch (SQLException e) {
+            // print the error message to the console and return an empty ArrayList
+            System.err.println("Error searching for products: " + e.getMessage());
+            return new ArrayList<String>();
+        }
+
+        // return the result ArrayList
+        return result;
+    }
 
 
 
