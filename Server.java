@@ -13,6 +13,8 @@ public class Server {
     private static String getUserData = "01"; //command index to get user data
     private static String addUserData = "02"; //command index to add user data
     private static String searchPurchaseHistoryByBuyerID = "03"; //command index to search purchase history of a customer
+    private static String searchCartByID = "04";
+    private static String search = "05";
 
     private static String dataBasePath =
             "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
@@ -101,7 +103,38 @@ public class Server {
                         out.println(historyString); // sent the string to client
                         out.flush(); // ensure that all data is sent immediately
                         // historyString example: "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
-                    } // you might create more else if here........
+                    } else if (request.substring(0,2).equals(searchCartByID)) {
+                        System.out.println("Processing searchCartByID");
+                        String id = request.substring(2);
+                        ArrayList<String> cart = db.searchCart(id); // getting info in array list
+                        // Making into string
+                        String cartString = "";
+                        for (String s: cart) {
+                            if (cart.indexOf(s) != cart.size() - 1) {
+                                cartString += s + "//"; // USING // AS SEPARATOR
+                            } else {
+                                cartString += s;
+                            }
+                        }
+                        out.print(cartString);
+                        out.flush();
+                    } else if (request.substring(0, 2).equals(search)) {
+                        System.out.println("Processing search");
+                        String search = request.substring(2);
+                        ArrayList<String> results = db.searchProduct();
+                        String resultsString = "";
+                        for (String s: results) {
+                            if (results.indexOf(s) != results.size() - 1) {
+                                resultsString += s + "//";
+                            } else {
+                                resultsString += s;
+                            }
+                        }
+                        out.print(resultsString);
+                        out.flush();
+                    }
+                    
+                    // you might create more else if here........
 
                 } // while loop
 
@@ -117,4 +150,3 @@ public class Server {
         }
     }
 }
-
