@@ -6,17 +6,14 @@ import java.util.ArrayList;
 /**
  * This is the Server class that will create connection and interact with the database.
  * This is a simple version that show how this class can be written for now.
- * @Version 2023/4/23 1.3
+ * @Version 2023/4/24 1.4
  * @author Libin Chen
  */
 public class Server {
     private static String getUserData = "01"; //command index to get user data
     private static String addUserData = "02"; //command index to add user data
     private static String searchPurchaseHistoryByBuyerID = "03"; //command index to search purchase history of a customer
-    private static String searchCartByID = "04";
-    private static String search = "05";
-    private static String updateProduct = "06";
-    private static String updateHistory = "07";
+    private static String productSeachEngine = "04"; //command index to search a certain product
 
     private static String dataBasePath =
             "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
@@ -105,64 +102,15 @@ public class Server {
                         out.println(historyString); // sent the string to client
                         out.flush(); // ensure that all data is sent immediately
                         // historyString example: "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
-                    } else if (request.substring(0,2).equals(searchCartByID)) {
-                        System.out.println("Processing searchCartByID");
-                        String id = request.substring(2);
-                        ArrayList<String> cart = db.searchCart(id); // getting info in array list
-                        // Making into string
-                        String cartString = "";
-                        for (String s: cart) {
-                            if (cart.indexOf(s) != cart.size() - 1) {
-                                cartString += s + "//"; // USING // AS SEPARATOR
-                            } else {
-                                cartString += s;
-                            }
-                        }
-                        out.print(cartString);
-                        out.flush();
-                    } else if (request.substring(0, 2).equals(search)) {
-                        System.out.println("Processing search");
-                        String search = request.substring(2);
-                        ArrayList<String> results = db.searchProduct();
-                        String resultsString = "";
-                        for (String s: results) {
-                            if (results.indexOf(s) != results.size() - 1) {
-                                resultsString += s + "//";
-                            } else {
-                                resultsString += s;
-                            }
-                        }
-                        out.print(resultsString);
-                        out.flush();
-                    } else if (request.substring(0, 2).equals(updateProduct)) {
-                        String prodId = request.substring(2, 4);
-                        if (prodId.substring(0, 1).equals("0")) {  // Sheds 0's
-                            prodId = request.substring(3, 4);
-                        }
-                        int quantity = Integer.parseInt(request.substring(4));
-                        db.updateProductQuantity(prodId, quantity);
-                    } else if (request.substring(0, 2).equals(updateHistory)) {
-                        // product_ID, store_ID, quantity, buyer_id, price
-                        String prodId = request.substring(2, 4);
-                        if (prodId.substring(0, 1).equals("0")) {
-                            prodId = request.substring(3, 4);
-                        }
-                        String storeId = request.substring(4, 6);
-                        if (storeId.substring(0, 1).equals("0")) {
-                            storeId = request.substring(5, 6);
-                        }
-                        String quant = request.substring(6,9); // allow three digits for quantity
-                        String buyerId = request.substring(9, 11);
-                        if (buyerId.substring(0, 1).equals("0")) {
-                            buyerId = request.substring(10, 11);
-                        }
-                        String price = request.substring(11, 17); // allow 5 digits (and decimal) for price
-                        db.addPurchaseHistory(prodId, storeId, Integer.parseInt(quant),
-                                buyerId, Double.parseDouble(price));
+                    } else if (request.substring(0, 2).equals(productSeachEngine)) {
+                        System.out.println("Processing productSearchEngine...");
+                        // handle request from CustomerClient to search for a certain product
+                        String searchWord = request.substring(2).toLowerCase(); // remove "04" and convert to lowercase
+                        ArrayList<String> matchingProducts = db.searchProducts(searchWord); // retrieve matching products from the database
+                        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        oos.writeObject(matchingProducts); // send the ArrayList to the client
+                        oos.flush(); // ensure that all data is sent immediately
                     }
-
-                    // you might create more else if here........
-
                 } // while loop
 
             } catch (IOException e) {
@@ -177,3 +125,4 @@ public class Server {
         }
     }
 }
+
