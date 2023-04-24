@@ -15,6 +15,8 @@ public class Server {
     private static String searchPurchaseHistoryByBuyerID = "03"; //command index to search purchase history of a customer
     private static String searchCartByID = "04";
     private static String search = "05";
+    private static String updateProduct = "06";
+    private static String updateHistory = "07";
 
     private static String dataBasePath =
             "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
@@ -132,8 +134,33 @@ public class Server {
                         }
                         out.print(resultsString);
                         out.flush();
+                    } else if (request.substring(0, 2).equals(updateProduct)) {
+                        String prodId = request.substring(2, 4);
+                        if (prodId.substring(0, 1).equals("0")) {  // Sheds 0's
+                            prodId = request.substring(3, 4);
+                        }
+                        int quantity = Integer.parseInt(request.substring(4));
+                        db.updateProductQuantity(prodId, quantity);
+                    } else if (request.substring(0, 2).equals(updateHistory)) {
+                        // product_ID, store_ID, quantity, buyer_id, price
+                        String prodId = request.substring(2, 4);
+                        if (prodId.substring(0, 1).equals("0")) {
+                            prodId = request.substring(3, 4);
+                        }
+                        String storeId = request.substring(4, 6);
+                        if (storeId.substring(0, 1).equals("0")) {
+                            storeId = request.substring(5, 6);
+                        }
+                        String quant = request.substring(6,9); // allow three digits for quantity
+                        String buyerId = request.substring(9, 11);
+                        if (buyerId.substring(0, 1).equals("0")) {
+                            buyerId = request.substring(10, 11);
+                        }
+                        String price = request.substring(11, 17); // allow 5 digits (and decimal) for price
+                        db.addPurchaseHistory(prodId, storeId, Integer.parseInt(quant),
+                                buyerId, Double.parseDouble(price));
                     }
-                    
+
                     // you might create more else if here........
 
                 } // while loop
