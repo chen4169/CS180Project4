@@ -13,7 +13,7 @@ public class Server {
     private static String getUserData = "01"; //command index to get user data
     private static String addUserData = "02"; //command index to add user data
     private static String searchPurchaseHistoryByBuyerID = "03"; //command index to search purchase history of a customer
-    private static String productSeachEngine = "04"; //command index to search a certain product
+    private static String productSearchEngine = "04"; //command index to search a certain product
 
     private static String dataBasePath =
             "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
@@ -102,7 +102,7 @@ public class Server {
                         out.println(historyString); // sent the string to client
                         out.flush(); // ensure that all data is sent immediately
                         // historyString example: "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
-                    } else if (request.substring(0, 2).equals(productSeachEngine)) {
+                    } else if (request.substring(0, 2).equals(productSearchEngine)) {
                         System.out.println("Processing productSearchEngine...");
                         // handle request from CustomerClient to search for a certain product
                         String searchWord = request.substring(2).toLowerCase(); // remove "04" and convert to lowercase
