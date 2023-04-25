@@ -14,9 +14,15 @@ public class Server {
     private static String addUserData = "02"; //command index to add user data
     private static String searchPurchaseHistoryByBuyerID = "03"; //command index to search purchase history of a customer
     private static String productSearchEngine = "04"; //command index to search a certain product
+    private static String searchCartByID = "05";
+    private static String updateProduct = "06";
+    private static String updateHistory = "07";
+    
+
+
 
     private static String dataBasePath =
-            "C://Users//Xince//IdeaProjects//CS18000//Database1.accdb";
+            "C://Users//owenw//Desktop//Proj5//src//Database1.accdb";
     private static int port = 4242;
     private static Database db;
 
@@ -110,7 +116,49 @@ public class Server {
                         ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                         oos.writeObject(matchingProducts); // send the ArrayList to the client
                         oos.flush(); // ensure that all data is sent immediately
+                    } else if (request.substring(0,2).equals(searchCartByID)) {
+                        System.out.println("Processing searchCartByID");
+                        String id = request.substring(2);
+                        ArrayList<String> cart = db.searchCart(id); // getting info in array list
+                        // Making into string
+                        String cartString = "";
+                        for (String s: cart) {
+                            if (cart.indexOf(s) != cart.size() - 1) {
+                                cartString += s + "//"; // USING // AS SEPARATOR
+                            } else {
+                                cartString += s;
+                            }
+                        }
+                        out.print(cartString);
+                        out.flush();
+                    }  else if (request.substring(0, 2).equals(updateProduct)) {
+                        String prodId = request.substring(2, 4);
+                        if (prodId.substring(0, 1).equals("0")) {  // Sheds 0's
+                            prodId = request.substring(3, 4);
+                        }
+                        int quantity = Integer.parseInt(request.substring(4));
+                        db.updateProductQuantity(prodId, quantity);
+                    } else if (request.substring(0, 2).equals(updateHistory)) {
+                        // product_ID, store_ID, quantity, buyer_id, price
+                        String prodId = request.substring(2, 4);
+                        if (prodId.substring(0, 1).equals("0")) {
+                            prodId = request.substring(3, 4);
+                        }
+                        String storeId = request.substring(4, 6);
+                        if (storeId.substring(0, 1).equals("0")) {
+                            storeId = request.substring(5, 6);
+                        }
+                        String quant = request.substring(6,9); // allow three digits for quantity
+                        String buyerId = request.substring(9, 11);
+                        if (buyerId.substring(0, 1).equals("0")) {
+                            buyerId = request.substring(10, 11);
+                        }
+                        String price = request.substring(11, 17); // allow 5 digits (and decimal) for price
+                        db.addPurchaseHistory(prodId, storeId, Integer.parseInt(quant),
+                                buyerId, Double.parseDouble(price));
                     }
+
+
                 } // while loop
 
             } catch (IOException e) {
@@ -125,4 +173,5 @@ public class Server {
         }
     }
 }
+
 
