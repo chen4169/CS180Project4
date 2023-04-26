@@ -502,4 +502,13 @@ public class Database {
             e.printStackTrace();
         }
     }
+    public void addToCart (int buyerID, int productID) {
+        Statement st = null;
+        String result = new String();
+        try {
+            st.executeQuery("INSERT INTO Cart ( Buyer_ID, Product_ID) Values ( " + buyerID + ", " + productID + ")");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
