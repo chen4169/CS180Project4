@@ -56,6 +56,16 @@ public class CustomerClient extends JComponent implements Runnable {
     }
 
 
+    // Just a method to make buttons look better
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Helvetica", Font.PLAIN, 22)); // Button font size
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(128, 128, 128)); // gray color
+        button.setPreferredSize(new Dimension(150, 150)); // Set button size to be the same
+        return button;
+    }
+
     @Override
     public void run() {
         try {
@@ -64,7 +74,7 @@ public class CustomerClient extends JComponent implements Runnable {
 
             this.db = new Database("bruh");
 
-            ArrayList<String> tempProd = db.searchProduct();
+            ArrayList<String> tempProd = db.searchProduct();  // FIXME -> should be sent as server request
             products = new String[tempProd.size()];  // translating to list of objects (need for JOption)
 
             for (int i = 0; i < tempProd.size(); i++) {
@@ -73,6 +83,7 @@ public class CustomerClient extends JComponent implements Runnable {
 
 
             frame = new JFrame("Market");  // creating frame
+            frame.setBackground(Color.black);
             frame.setLayout(new BorderLayout());
             frame.setSize(1200, 800);
             frame.setLocationRelativeTo(null);
@@ -80,11 +91,11 @@ public class CustomerClient extends JComponent implements Runnable {
             frame.setVisible(true);
 
 
-            search = new JButton("Search");
-            viewMarket = new JButton("View Market");
-            sort = new JButton("Sort");
-            viewCart = new JButton("View Cart");
-            export = new JButton("Export History");
+            search = createStyledButton("Search");
+            viewMarket = createStyledButton("View Market");
+            sort = createStyledButton("Sort");
+            viewCart = createStyledButton("View Cart");
+            export = createStyledButton("Export History");
 
 
             // CREATING GUI
@@ -95,57 +106,29 @@ public class CustomerClient extends JComponent implements Runnable {
             top.setPreferredSize(new Dimension(100, 100));
             title = new JLabel("Welcome to the Market!");
             title.setFont(new Font("Verdana", Font.PLAIN, 50));
+            title.setFont(new Font("Helvetica", Font.BOLD, 28)); // Increase title font size
+            title.setForeground(Color.WHITE);
+            title.setHorizontalAlignment(SwingConstants.CENTER);
             top.add(title);
 
             // Center (main) panel with buttons
-            JPanel center = new JPanel();
-            center.setLayout(new BorderLayout());
-            center.setPreferredSize(new Dimension(800, 600));
-
-            JPanel subEast = new JPanel();
-            subEast.setPreferredSize(new Dimension(400, 300));
-            subEast.setLayout(new BoxLayout(subEast, BoxLayout.Y_AXIS));
-
-            subEast.add(Box.createRigidArea(new Dimension(0, 10)));  // Spacer
-            subEast.add(viewMarket);
-            subEast.add(Box.createRigidArea(new Dimension(0, 10)));  // Spacer
-            subEast.add(sort);
+            JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+            buttonPanel.setOpaque(false);
+            buttonPanel.add(search);
+            buttonPanel.add(viewMarket);
+            buttonPanel.add(sort);
+            buttonPanel.add(export);
 
 
-            JPanel subWest = new JPanel();
-            subWest.setPreferredSize(new Dimension(400, 300));
-            subWest.setLayout(new BoxLayout(subWest, BoxLayout.Y_AXIS));
-            subWest.add(Box.createRigidArea(new Dimension(0, 10)));  // Spacer
-            subWest.add(viewCart);
-            subWest.add(Box.createRigidArea(new Dimension(0, 10)));  // Spacer
-            subWest.add(export);
-
-
-            // Center aligning and adding
-            center.add(subEast, BorderLayout.EAST);
-            center.add(subWest, BorderLayout.WEST);
-
-
-            // West,East,South borders (mainly for spacing)
-            JPanel east = new JPanel();
-            east.setPreferredSize(new Dimension(200, 600));
-            JPanel west = new JPanel();
-            west.setPreferredSize(new Dimension(200, 600));
-
-            JPanel south = new JPanel();
-            south.setPreferredSize(new Dimension(100, 100));
-            south.add(search);
 
             // Adding panels to frame
             frame.add(top, BorderLayout.NORTH);
-            frame.add(east, BorderLayout.EAST);
-            frame.add(west, BorderLayout.WEST);
-            frame.add(center, BorderLayout.CENTER);
-            frame.add(south, BorderLayout.SOUTH);
+            frame.add(buttonPanel, BorderLayout.CENTER);
+            frame.add(viewCart, BorderLayout.SOUTH);
 
 
             // LISTENERS
-            // FIXME - HIDES THE MAIN FRAME -> MAKE VISIBLE LATER (ALSO HANDLE DISPOSING FRAME)
+            // FIXME - HIDES THE MAIN FRAME -> MAKE VISIBLE LATER (ALSO HANDLE DISPOSING FRAME -> Think is working)
             search.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
 
@@ -288,6 +271,7 @@ public class CustomerClient extends JComponent implements Runnable {
 
             viewMarket.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+
                     frame.setVisible(false);
 
                     String choice = (String) JOptionPane.showInputDialog(null, "Products:",
