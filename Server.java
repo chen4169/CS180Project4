@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
@@ -18,7 +19,7 @@ public class Server {
     private static String updateHistory = "07";
     private static String addToCart = "08";
     private static String listAllProducts = "09";
-    private static String dataBasePath = "C://tmp//CSproject5//CSproject5//Database1.accdb";
+    private static String dataBasePath = "C://Users//Q1892//IdeaProjects//MyProjects//src//Project5//Database1.accdb";
     private static int port = 123;
     private static Database db;
 
