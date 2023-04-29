@@ -10,16 +10,12 @@ import java.net.Socket;
  * @Version 2023/4/28 1.3
  * @author Owen Willis, Libin Chen
  */
-public class CustomerClient extends JComponent {
+public class CustomerClient extends JComponent implements Runnable {
     private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
     private static String listAllProducts = "09";
     private BufferedReader in;
     private PrintWriter out;
     String id, username, password, trueName;
-    JFrame frame;
-    JButton search, viewMarket, sort, viewCart, export;
-    JLabel title;
-    Database db;
     Socket socket;
 
 
@@ -32,16 +28,7 @@ public class CustomerClient extends JComponent {
         this.trueName = userDataArray[3];
         this.in = in;
         this.out = out;
-    }
 
-    // Just a method to make buttons look better
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text); // Create a new button with the given text
-        button.setFont(new Font("Helvetica", Font.PLAIN, 22)); // Set the font of the button text to Helvetica with size 22
-        button.setForeground(Color.WHITE); // Set the color of the button text to white
-        button.setBackground(new Color(128, 128, 128)); // Set the background color of the button to gray
-        button.setPreferredSize(new Dimension(150, 150)); // Set the preferred size of the button to 150x150 pixels
-        return button; // Return the created button
     }
 
     /**
@@ -69,17 +56,24 @@ public class CustomerClient extends JComponent {
         }
         return true;
     }
+    public void start() {
+        SwingUtilities.invokeLater(this);
+    }
 
-    public boolean start() throws IOException {
+    public void run()  {
         boolean correct = passwordTest();
-        if (!correct) { // if the user click to exit
-            return false;
-        }
+
 
         // ask the Server to get all products
-        out.println(listAllProducts);
-        String productList = in.readLine();
-        System.out.println(productList);
+        String productList = "";
+        try {
+            out.println(listAllProducts);
+            productList = in.readLine();
+            System.out.println(productList);
+        } catch (IOException err) {
+            JOptionPane.showMessageDialog(null, "Didn't work", "IDK", JOptionPane.PLAIN_MESSAGE);
+            err.printStackTrace();
+        }
         // example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100@2,Vodka,3,Vodka alcohol 1L bottle,24,125@3,tomato,1,A red fruit,100,5
 
         // parse the productList string
@@ -88,57 +82,22 @@ public class CustomerClient extends JComponent {
         //--------------------------------------------------------------------
 
         JOptionPane.showMessageDialog(null, "run1");
-        frame = new JFrame("Market");  // Create a new JFrame with the title "Market"
-        frame.setBackground(Color.black); // Set the background color of the frame to black
-        frame.setLayout(new BorderLayout()); // Set the layout manager of the frame to BorderLayout
-        frame.setSize(1200, 800); // Set the size of the frame to 1200x800 pixels
-        frame.setLocationRelativeTo(null); // Center the frame on the screen
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Set the default close operation to dispose the frame
-        frame.setVisible(true); // Set the frame to be visible
+        CustGUI gui = new CustGUI();
+        if (!correct) { // if the user click to exit
+            JOptionPane.showMessageDialog(null, "Goodbye!", "Market", JOptionPane.PLAIN_MESSAGE);
+            gui.dispose();
+        } else {
+            gui.setVisible(true);
+        }
 
-        search = createStyledButton("Search"); // Create a new styled button with the text "Search"
-        viewMarket = createStyledButton("View Market"); // Create a new styled button with the text "View Market"
-        sort = createStyledButton("Sort"); // Create a new styled button with the text "Sort"
-        viewCart = createStyledButton("View Cart"); // Create a new styled button with the text "View Cart"
-        export = createStyledButton("Export History"); // Create a new styled button with the text "Export History"
-        JOptionPane.showMessageDialog(null, "run2");
-
-
-        // CREATING GUI
-
-
-        // Title stuff
-        JPanel top = new JPanel();
-        top.setPreferredSize(new Dimension(100, 100));
-        title = new JLabel("Welcome to the Market!");
-        title.setFont(new Font("Verdana", Font.PLAIN, 50));
-        title.setFont(new Font("Helvetica", Font.BOLD, 28)); // Increase title font size
-        title.setForeground(Color.WHITE);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        top.add(title);
-        JOptionPane.showMessageDialog(null, "run3");
-
-        // Center (main) panel with buttons
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(search);
-        buttonPanel.add(viewMarket);
-        buttonPanel.add(sort);
-        buttonPanel.add(export);
-
-
-        // Adding panels to frame
-        frame.add(top, BorderLayout.NORTH);
-        frame.add(buttonPanel, BorderLayout.CENTER);
-        frame.add(viewCart, BorderLayout.SOUTH);
 
 
         // LISTENERS
         // FIXME - HIDES THE MAIN FRAME -> MAKE VISIBLE LATER (ALSO HANDLE DISPOSING FRAME -> Think is working)
-        search.addActionListener(new ActionListener() {
+        gui.search.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                frame.setVisible(false);
+                gui.setVisible(false);
                 boolean suc = false;
                 String searchWord;
 
@@ -270,15 +229,15 @@ public class CustomerClient extends JComponent {
                     }
                 }
 
-                frame.setVisible(true);
+                gui.setVisible(true);
             }
         });
 
 
-        viewMarket.addActionListener(new ActionListener() {
+        gui.viewMarket.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                frame.setVisible(false);
+                gui.setVisible(false);
 
                 String choice = (String) JOptionPane.showInputDialog(null, "Products:",
                         "Market", JOptionPane.PLAIN_MESSAGE, null, products, products[0]);
@@ -370,13 +329,13 @@ public class CustomerClient extends JComponent {
                     }
                 }
 
-                frame.setVisible(true);
+                gui.setVisible(true);
             }
         });
 
-        viewCart.addActionListener(new ActionListener() {
+        gui.viewCart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
+                gui.setVisible(false);
 
                 // TODO: Change to server request -> Request USER ID's cart
                 out.print("05" + id);
@@ -491,19 +450,19 @@ public class CustomerClient extends JComponent {
                     JOptionPane.showMessageDialog(null, "Error Retrieving Cart", "Market", JOptionPane.ERROR_MESSAGE);
                 }
 
-                frame.setVisible(true);
+                gui.setVisible(true);
             }
         });
 
-        export.addActionListener(new ActionListener() {
+        gui.export.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
+                gui.setVisible(false);
 
                 // Getting file information
                 String exportFileName = JOptionPane.showInputDialog(null,
                         "Enter file name you want to export to (before the '.'): ", "Market",
                         JOptionPane.QUESTION_MESSAGE);
-                if (!exportFileName.isEmpty()) {
+                if (!(exportFileName == null)) {
                     exportFileName += ".csv";
 
                     // TODO: server request for history related to id -> store in ArrayList "history" below
@@ -533,14 +492,14 @@ public class CustomerClient extends JComponent {
                     JOptionPane.showMessageDialog(null, "Canceling Export", "Market",
                             JOptionPane.PLAIN_MESSAGE);
                 }
-                frame.setVisible(true);
+                gui.setVisible(true);
 
             }
         });
 
-        sort.addActionListener(new ActionListener() {
+        gui.sort.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
+                gui.setVisible(false);
 
                 String[] op = {"Quantity", "Price"};
                 int sortType = JOptionPane.showOptionDialog(null,
@@ -576,11 +535,11 @@ public class CustomerClient extends JComponent {
                     }
                     JOptionPane.showMessageDialog(null, "Market Sorted! Check 'View Market' to see.", "Market", JOptionPane.INFORMATION_MESSAGE);
 
-                    frame.setVisible(true);
+
                 }
+                gui.setVisible(true);
             }
         });
-        return true;
     }
 
 }
