@@ -1,4 +1,3 @@
-package Project5;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,12 +5,12 @@ import java.util.List;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
- * @Version 2023/4/24 1.3
+ * @Version 2023/4/28 1.4
  * @author Libin Chen
  */
 
 /**
- * Important: the file path 'url' must be in the form 'jdbc:ucanaccess://C://path1//path2//path3//path4//Database1.accdb'
+ * Important: the file path 'url' must be in the form 'jdbc:ucanaccess://path1//path2//path3//path4//Database1.accdb'
  */
 public class Database {
     private Connection con;
@@ -45,7 +44,7 @@ public class Database {
             pstmt.setString(2, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                String userType = rs.getString(2).startsWith("B") ? "C" : "S";
+                String userType = rs.getString(2).startsWith("B") ? "S" : "C";
                 return userType + rs.getInt(1) + "," + rs.getString(2) + "," + rs.getString(3) + "," + rs.getString(4);
             }
         } catch (SQLException e) {
@@ -169,6 +168,33 @@ public class Database {
         return result;
     }
 
+    /**
+     * Searches through all products in the Products table of the database and returns a string
+     * in which each element is separated by a ",".
+     * @return A string, where each element separated by a "@" represents a row in the Products table
+     */
+    public String listAllProducts() {
+        ArrayList<String> result = new ArrayList<>();
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Products");
+            while (rs.next()) {
+                String productId = rs.getString("Product_ID");
+                String productName = rs.getString("Product_name");
+                String storeId = rs.getString("Store_ID");
+                String productDesc = rs.getString("Product_description");
+                String quantityAvail = rs.getString("Quantity_available");
+                String price = rs.getString("Price");
+
+                String product = productId + "," + productName + "," + storeId + "," + productDesc + "," + quantityAvail + "," + price;
+                result.add(product);
+            }
+            return String.join("@", result);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 
 
     public String searchBuyerData(String username) {
@@ -500,15 +526,6 @@ public class Database {
             System.out.println("Buyer added successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-    public void addToCart (int buyerID, int productID) {
-        Statement st = null;
-        String result = new String();
-        try {
-            st.executeQuery("INSERT INTO Cart ( Buyer_ID, Product_ID) Values ( " + buyerID + ", " + productID + ")");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 }
