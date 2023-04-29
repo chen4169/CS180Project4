@@ -1,4 +1,3 @@
-package Project5;
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
@@ -6,7 +5,7 @@ import java.util.ArrayList;
 /**
  * This is the Server class that will create connection and interact with the database.
  * This is a simple version that show how this class can be written for now.
- * @Version 2023/4/24 1.5
+ * @Version 2023/4/28 1.6
  * @author Libin Chen
  */
 public class Server {
@@ -18,13 +17,9 @@ public class Server {
     private static String updateProduct = "06";
     private static String updateHistory = "07";
     private static String addToCart = "08";
-
-
-
-
-    private static String dataBasePath =
-            "C://Users//owenw//Desktop//Proj5//src//Database1.accdb";
-    private static int port = 4242;
+    private static String listAllProducts = "09";
+    private static String dataBasePath = "C://tmp//CSproject5//CSproject5//Database1.accdb";
+    private static int port = 123;
     private static Database db;
 
     public static void main(String[] args) throws IOException {
@@ -171,11 +166,17 @@ public class Server {
                         String price = request.substring(11, 17); // allow 5 digits (and decimal) for price
                         db.addPurchaseHistory(prodId, storeId, Integer.parseInt(quant),
                                 buyerId, Double.parseDouble(price));
-                    } else if (request.substring(0, 2).equals(addToCart)) {
+                    }
+                    else if (request.substring(0, 2).equals(addToCart)) {
                         // Witerawy woot wake fwom fowtnite
                     }
-
-
+                    else if (request.substring(0, 2).equals(listAllProducts)) {
+                        System.out.println("Processing listAllProducts...");
+                        // handle request from CustomerClient to list all products
+                        String productList = db.listAllProducts();
+                        out.println(productList);
+                        out.flush();
+                    }
                 } // while loop
 
             } catch (IOException e) {
