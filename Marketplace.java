@@ -1,3 +1,4 @@
+
 import javax.swing.JOptionPane;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -14,7 +15,7 @@ import java.net.Socket;
  * @version 1.4 2020/4/28
  * @author Libin Chen
  */
-public class MarketPlace {
+public class Marketplace {
     private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
     private static String getUserData = "01"; //command index to tell the Server to get user data
     private static String addUserData = "02"; //command index to tell the Server to add user data
@@ -89,16 +90,17 @@ public class MarketPlace {
                 if (response.startsWith("S")) {
                     JOptionPane.showMessageDialog(null, "run SellerClient");
                     // response starts with "S"
-                    //SellerClient client = new SellerClient(socket, response.substring(1)); // pass the account information accordingly
+                    SellerClient client = new SellerClient(socket, response.substring(1), in, out); // pass the account information accordingly
                     //client.start(); // start the client
                 } else if (response.startsWith("C")) {
                     JOptionPane.showMessageDialog(null, "run CustomerClient");
                     // response starts with "C"
                     CustomerClient client = new CustomerClient(socket, response.substring(1), in, out); // pass the account information accordingly
-                    boolean success = client.start(); // start the client
-                    if (!success) {
-                        return false;
-                    }
+                    //boolean success = client.start(); // start the client
+                    //if (!success) {
+                    //    return false;
+                    //}
+                    client.run();
 
                 }
                 break;
