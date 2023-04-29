@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,6 +13,7 @@ import java.net.Socket;
  */
 public class CustomerClient extends JComponent implements Runnable {
     private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
+    private static String productSearchEngine = "04"; //command index to search a certain product
     private static String listAllProducts = "09";
     private BufferedReader in;
     private PrintWriter out;
@@ -117,15 +119,14 @@ public class CustomerClient extends JComponent implements Runnable {
                 System.out.println(searchWord);
 
                 if (searchWord != null) {
-
-
                     // TODO: Send the search term to the server -> STORE IN ARRAYLIST "r" below (Check if works)
-                    out.print("04" + searchWord);
+                    out.print(productSearchEngine + searchWord);
                     out.flush();
                     String[] results;
 
                     try {
                         results = in.readLine().split("//");
+                        JOptionPane.showMessageDialog(null, results);
 
                         // Displaying results in dropdown window
                         String choice = (String) JOptionPane.showInputDialog(null, "Search",
