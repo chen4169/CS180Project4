@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -195,105 +196,6 @@ public class Database {
             return "";
         }
     }
-
-
-    public String searchBuyerData(String username) {
-        String buyerInfo = "";
-        try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Buyers WHERE Buyer_Username = '" + username + "'");
-
-            if (rs.next()) {
-                String buyerId = rs.getString("id");
-                String buyerUsername = rs.getString("Buyer_Username");
-                String buyerPassword = rs.getString("Buyer_Password");
-                String buyerName = rs.getString("Buyer_Name");
-                buyerInfo = String.join(",", buyerId, buyerUsername, buyerPassword, buyerName);
-                System.out.println("Buyer information: " + buyerInfo);
-            } else {
-                System.out.println("No buyer found with the given username.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return buyerInfo;
-    }
-
-    public String searchSellerData(String username) {
-        String sellerInfo = "";
-        try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Sellers WHERE Seller_Username = '" + username + "'");
-
-            if (rs.next()) {
-                String sellerId = rs.getString("Seller_ID");
-                String sellerUsername = rs.getString("Seller_Username");
-                String sellerPassword = rs.getString("Seller_Password");
-                String sellerName = rs.getString("Seller_Name");
-                sellerInfo = String.join(",", sellerId, sellerUsername, sellerPassword, sellerName);
-                System.out.println("Seller information: " + sellerInfo);
-            } else {
-                System.out.println("No seller found with the given username.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return sellerInfo;
-    }
-
-    public String findMasSellerID() {
-        try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT MAX(Seller_ID) AS max_id FROM Sellers");
-
-            if (rs.next()) {
-                int maxId = rs.getInt("max_id");
-                sellerCounter = String.valueOf(maxId);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return sellerCounter;
-    }
-
-    public String findBuyerCounter() {
-        try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT MAX(ID) AS max_id FROM Buyers");
-
-            if (rs.next()) {
-                int maxId = rs.getInt("max_id");
-                buyerCounter = String.valueOf(maxId);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return buyerCounter;
-    }
-
-    public ArrayList<String> searchProduct() {
-        ArrayList<String> productList = new ArrayList<String>();
-        try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Products");
-
-            while (rs.next()) {
-                String productId = rs.getString("Product_ID");
-                String productName = rs.getString("Product_name");
-                String storeId = rs.getString("Store_ID");
-                String productDesc = rs.getString("Product_description");
-                int quantityAvailable = rs.getInt("Quantity_available");
-                double price = rs.getDouble("Price");
-
-                String productInfo = String.join(",", productId, productName, storeId, productDesc, Integer.toString(quantityAvailable), Double.toString(price));
-                productList.add(productInfo);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return productList;
-    }
-
     public ArrayList<String> searchCart(String buyerId) {
         ArrayList<String> cartData = new ArrayList<String>();
         try {
@@ -311,7 +213,6 @@ public class Database {
         }
         return cartData;
     }
-
     public ArrayList<String> loadMarkets() {
         ArrayList<String> marketData = new ArrayList<>();
         try {
@@ -329,7 +230,6 @@ public class Database {
         }
         return marketData;
     }
-
     public void addToCart(String buyerID, String productID) {
         try {
             Statement stmt = con.createStatement();
@@ -340,7 +240,6 @@ public class Database {
             e.printStackTrace();
         }
     }
-
     public void emptyCart (){
         try {
             Statement stmt = con.createStatement();
@@ -351,7 +250,6 @@ public class Database {
             e.printStackTrace();
         }
     }
-
     public void addPurchaseHistory(String productID, String storeID, int quantity, String buyerID, double price) {
         try {
             Statement stmt = con.createStatement();
@@ -451,21 +349,6 @@ public class Database {
         }
     }
 
-    public String getMaxProductId() {
-        String maxProductId = "";
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "SELECT MAX(Product_ID) FROM Products";
-            ResultSet rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                maxProductId = rs.getString(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return maxProductId;
-    }
-
     public void searchPurchaceHistoryByStoreId(String storeId) {
         try {
             String query = "SELECT * FROM PurchaceHistory WHERE Store_ID = ?";
@@ -507,25 +390,4 @@ public class Database {
         }
     }
 
-    public void addSeller(String sellerID, String username, String password, String name) {
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "INSERT INTO Sellers (Seller_ID, Seller_Username, Seller_Password, Seller_Name) VALUES ('" + sellerID + "', '" + username + "', '" + password + "', '" + name + "')";
-            stmt.executeUpdate(sql);
-            System.out.println("Seller added successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addBuyer(String id, String username, String password, String name) {
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "INSERT INTO Buyers (ID, Buyer_Username, Buyer_Password, Buyer_Name) VALUES ('" + id + "', '" + username + "', '" + password + "', '" + name + "')";
-            stmt.executeUpdate(sql);
-            System.out.println("Buyer added successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
