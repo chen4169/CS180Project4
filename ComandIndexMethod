@@ -1,3 +1,7 @@
 what my command index is: 01
 
 what I want to return: void
+
+
+Command Index: 08
+  I would like it to match with the the actual database, so the server can add the quantity of item and price of item to the cart
