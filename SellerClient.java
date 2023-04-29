@@ -6,8 +6,6 @@ import java.util.ArrayList;
  */
 public class SellerClient {
 
-    //TODO: implement ability to select "x" or "cancel" and have the program end without error
-
     public static void main(String[] args) {
 
         // seller interface
@@ -32,7 +30,7 @@ public class SellerClient {
                     int marketChosenIdInt = Integer.parseInt(MarketChosenId);
                     if (marketChosenIdInt >= 0 && marketChosenIdInt <= storeCounter) {
                         String[] marketChosen = null;
-                        ArrayList<String> foundProducts = new ArrayList<String>();
+                        ArrayList<String> foundProducts;
                         foundProducts = db.searchProductsByMarket(MarketChosenId);
                         if (foundProducts == null) {
                             storeNotFoundMessageDialog();
@@ -53,7 +51,6 @@ public class SellerClient {
 
                             String sellerChoice = sellerChoiceInputDialog();
                             if (sellerChoice.equals("Remove Products")) { // remove products
-                                //TODO: no error check for invalid index
                                 int productIndex = Integer.parseInt(productToRemoveInputDialog());
                                 db.removeProduct(productIndex);
                             } else if (sellerChoice.equals("Add Products")) { // add item
@@ -75,24 +72,25 @@ public class SellerClient {
                                 String productId = db.getMaxProductId();
                                 db.addProductBySeller(productId, productName, storeId, productDescription, productQuantity, productPrice);
                             } else if (sellerChoice.equals("View Sales")) { // checking sales
-                                //TODO: implement this properly
+                                //TODO: implement this properly, drop down of stores which will provide history upon
+                                // selection
                                 for (String store : stores) {
                                     singleMarket = store.split(","); // an array of stores
                                     db.searchPurchaceHistoryByStoreId(singleMarket[0]);
                                 }
                             } else if (sellerChoice.equals("Quit")) { // Quits loop of program
-                                thankYouMessageDialog();
+                                thankYouMessageDialog(); //goodbye message window "Thank you for using the market!"
                                 return;
                             }
                         }
                         break;
                     }
                 } catch (Exception e) {
-                    randomErrorMessageDialog();
+                    randomErrorMessageDialog(); //Any exception that occurs throws an error "Error, invalid input!"
                 }
             } while (true);
         }
-        thankYouMessageDialog();
+        thankYouMessageDialog(); //goodbye message window "Thank you for using the market!"
     }
 
     //--------------------------------------    GUI METHODS   ------------------------------------------------------
