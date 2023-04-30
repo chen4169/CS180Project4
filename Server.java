@@ -20,6 +20,12 @@ public class Server {
     private static String addToCart = "08";
     private static String listAllProducts = "09";
     private static String purchaseProduct = "10"; //command index to purchase a product
+    private static String deleteCartItem = "11" ;//command index to delete a cart item
+    private static String searchProductsByStoreID = "12"; //command index to search product belong to a seller
+    private static String searchMarketsBySellerId = "13"; //command index to search stores belong to a seller
+    private static String removeProduct = "14"; //command index to remove a product
+    private static String addProductBySeller = "15"; //command index to add a product
+    private static String searchPurchaseHistoryByStoreId = "16"; //command index to search purchase history related to a store
     private static String dataBasePath = "C://tmp//CSproject5//CSproject5//Database1.accdb";
     private static int port = 4242;
     private static Database db;
@@ -84,6 +90,7 @@ public class Server {
 
                 String request;
                 while ((request = in.readLine()) != null) {
+                    System.out.println("new request: " + request);
                     if (request.substring(0, 2).equals(getUserData)) {
                         System.out.println("Processing getUserData...");
                         // handle request from Marketplace to check username
@@ -91,7 +98,7 @@ public class Server {
                         String response = db.getUserData(username);
                         out.println(response);
                         out.flush(); // ensure that all data is sent immediately
-                    }
+                    } //Done "TestBuyer1" "C1,TestBuyer1,123456,TestBuyer1"
                     else if (request.substring(0, 2).equals(addUserData)) {
                         System.out.println("Processing addUserData...");
                         // handle request from Marketplace to add new user data
@@ -99,82 +106,111 @@ public class Server {
                         String response = db.addUserData(userData); // pass the user data as a single input string to the addUserData method
                         out.println(response);
                         out.flush(); // ensure that all data is sent immediately
-                    }
+                    } //Done "Susername,password,trueName" message
                     else if (request.substring(0, 2).equals(searchPurchaseHistoryByBuyerID)) {
                         System.out.println("Processing searchPurchaseHistoryByBuyerID...");
                         // handle request from CustomerClient to search purchase history
-                        int customerID = Integer.parseInt(request.substring(2)); // remove "03"
+                        String customerID = request.substring(2); // remove "03"
                         String[] purchaseHistory = db.searchPurchaseHistoryByBuyerID(customerID); // retrieve purchase history from the database
                         String historyString = String.join("@", purchaseHistory); // convert to a string separated by @
                         out.println(historyString); // sent the string to client
                         out.flush(); // ensure that all data is sent immediately
                         // historyString example: "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
-                    }
+                    } //Done  "13", could send empty "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
                     else if (request.substring(0, 2).equals(productSearchEngine)) {
                         System.out.println("Processing productSearchEngine...");
                         // handle request from CustomerClient to search for a certain product
                         String searchWord = request.substring(2).toLowerCase(); // remove "04" and convert to lowercase
                         String response = db.searchProducts(searchWord);
-                        System.out.println("Processing productSearchEngine..." + response);
                         out.print(response);
                         out.flush();
-                    }
+                    } //Done "vo" "1,Vodka,5,Vodka alcohol 1L bottle,49,100.0@2,Vodka,3,Vodka alcohol 1L bottle,24,125.0@"
                     else if (request.substring(0,2).equals(searchCartByID)) {
-                        System.out.println("Processing searchCartByID");
+                        System.out.println("Processing searchCartByID...");
                         String id = request.substring(2);
-                        ArrayList<String> cart = db.searchCart(id); // getting info in array list
-                        // Making into string
-                        String cartString = "";
-                        for (String s: cart) {
-                            if (cart.indexOf(s) != cart.size() - 1) {
-                                cartString += s + "//"; // USING // AS SEPARATOR
-                            } else {
-                                cartString += s;
-                            }
-                        }
+                        String cartString = db.searchCartByCustomer(id); // getting info in array list
                         out.print(cartString);
                         out.flush();
-                    }
+                    } //Done "13", could send empty "10,1,Vodka,2,7,100.0@"
                     else if (request.substring(0, 2).equals(updateProduct)) {
-                        String prodId = request.substring(2, 4);
-                        if (prodId.substring(0, 1).equals("0")) {  // Sheds 0's
-                            prodId = request.substring(3, 4);
-                        }
-                        int quantity = Integer.parseInt(request.substring(4));
-                        db.updateProductQuantity(prodId, quantity);
-                    }
+                        System.out.println("Processing updateProduct...");
+                        String choice = request.substring(2);
+                        // choice example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100,1
+                        String response = db.updateProduct(choice);
+                        out.print(response);
+                        out.flush();
+                    } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7"
                     else if (request.substring(0, 2).equals(updateHistory)) {
-                        // product_ID, store_ID, quantity, buyer_id, price -> COULD FIX WITH CSV SPLIT
-                        String prodId = request.substring(2, 4);
-                        if (prodId.substring(0, 1).equals("0")) {
-                            prodId = request.substring(3, 4);
-                        }
-                        String storeId = request.substring(4, 6);
-                        if (storeId.substring(0, 1).equals("0")) {
-                            storeId = request.substring(5, 6);
-                        }
-                        String quant = request.substring(6,9); // allow three digits for quantity
-                        String buyerId = request.substring(9, 11);
-                        if (buyerId.substring(0, 1).equals("0")) {
-                            buyerId = request.substring(10, 11);
-                        }
-                        String price = request.substring(11, 17); // allow 5 digits (and decimal) for price
-                        db.addPurchaseHistory(prodId, storeId, Integer.parseInt(quant),
-                                buyerId, Double.parseDouble(price));
-                    }
+                        System.out.println("Processing updateHistory...");
+                        String purchaseInfo = request.substring(2); // remove "07" and convert to lowercase
+                        String storeName = db.getStoreName(purchaseInfo);
+                        purchaseInfo = purchaseInfo + "," + storeName;
+                        String message = db.addPurchaseHistory(purchaseInfo);
+                        out.print(message);
+                        out.flush();
+                    } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3" message
                     else if (request.substring(0, 2).equals(listAllProducts)) {
                         System.out.println("Processing listAllProducts...");
                         // handle request from CustomerClient to list all products
                         String productList = db.listAllProducts();
                         out.println(productList);
                         out.flush();
-                    }
+                    } //Done None "1,Vodka,5,Vodka alcohol 1L bottle,49,100@2,Vodka,3,Vodka alcohol 1L bottle,24,125"
                     else if (request.substring(0, 2).equals(purchaseProduct)) {
                         System.out.println("Processing purchaseProduct...");
                         String purchaseMessage = db.updateProduct(request);
                         out.println(purchaseMessage);
                         out.flush();
-                    }
+                    } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,1" message
+                    else if (request.substring(0, 2).equals(addToCart)) {
+                        System.out.println("Processing addToCart...");
+                        String purchaseInfo = request.substring(2);
+                        String message = db.updateProduct(purchaseInfo);
+                        out.println(message);
+                        out.flush();
+                    } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,2" message
+                    else if (request.substring(0, 2).equals(deleteCartItem)) {
+                        System.out.println("Processing deleteCartItem...");
+                        String itemID = request.substring(2);
+                        String message = db.updateProduct(itemID);
+                        out.println(message);
+                        out.flush();
+                    } //Done "1" message
+                    else if (request.substring(0, 2).equals(searchProductsByStoreID)) {
+                        System.out.println("Processing searchProductsByStoreID...");
+                        String StoreID = request.substring(2);
+                        String response = db.searchProductsByStoreID(StoreID);
+                        out.println(response);
+                        out.flush();
+                    } //Done "1" "3,tomato,1,A red fruit,100,5@5,tomato,1,A red fruit,200,5@"
+                    else if (request.substring(0, 2).equals(searchMarketsBySellerId)) {
+                        System.out.println("Processing searchMarketsBySellerId...");
+                        String sellerID = request.substring(2);
+                        String response = db.searchMarketsBySellerId(sellerID);
+                        out.println(response);
+                        out.flush();
+                    } //Done "1" "1,CS shop,1@4,Target,1"
+                    else if (request.substring(0, 2).equals(removeProduct)) {
+                        System.out.println("Processing searchMarketsBySellerId...");
+                        String productID = request.substring(2);
+                        String message = db.removeProduct(productID);
+                        out.println(message);
+                        out.flush();
+                    } //Done "4" message
+                    else if (request.substring(0, 2).equals(addProductBySeller)) {
+                        System.out.println("Processing addProductBySeller...");
+                        String productInfo = request.substring(2);
+                        String message = db.addProductBySeller(productInfo);
+                        out.println(message);
+                        out.flush();
+                    } //Done "red pen,5,a red pen,49,2.5" message
+                    else if (request.substring(0, 2).equals(searchPurchaseHistoryByStoreId)) {
+                        System.out.println("Processing searchPurchaseHistoryByStoreId...");
+                        String historyInfo = request.substring(2);
+                        String response = db.addProductBySeller(historyInfo);
+                        out.println(response);
+                        out.flush();
+                    } //Done "5" "1,5,7,3,100.0,Vodka,NC,14"
                 } // while loop
             } catch (Exception e) {
                 System.out.println("Error handling client request: " + e);
