@@ -1,17 +1,14 @@
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
+
 
 /**
  * This is a client class that provides the interface for a customer to exchange information with the server.
- * @Version 2023/4/30 1.4
+ * @Version 2023/4/30 1.5
  * @author Owen Willis, Libin Chen
  */
-public class CustomerClient extends JComponent {
+public class CustomerClient {
     private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
     private static String productSearchEngine = "04"; //command index to search a certain product
     private static String listAllProducts = "09";
