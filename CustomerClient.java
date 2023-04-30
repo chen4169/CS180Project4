@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * This is a client class that provides the interface for a customer to exchange information with the server.
- * @Version 2023/4/28 1.3
+ * @Version 2023/4/30 1.4
  * @author Owen Willis, Libin Chen
  */
 public class CustomerClient extends JComponent {
