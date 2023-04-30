@@ -36,19 +36,23 @@ public class Database {
      * @return A string that contains all the information of an account
      */
     public String getUserData(String username) {
-        String query = "SELECT * FROM Buyers WHERE Buyer_Username = ? UNION SELECT * FROM Sellers WHERE Seller_Username = ?";
+        String query = "SELECT * FROM Buyers WHERE Buyer_Username = ?";
+        String queryTwo = "SELECT * FROM Sellers WHERE Seller_Username = ?";
         try {
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, username);
-            pstmt.setString(2, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                String userType = rs.getString(2).startsWith("B") ? "S" : "C";
-                return userType + rs.getInt(1) + "," + rs.getString(2) + "," + rs.getString(3) + "," + rs.getString(4);
+                return "C" + rs.getInt(1) + "," + rs.getString(2) + "," + rs.getString(3) + "," + rs.getString(4);
+            }
+            PreparedStatement pstmtTwo = con.prepareStatement(queryTwo);
+            pstmtTwo.setString(1, username);
+            ResultSet rsTwo = pstmtTwo.executeQuery();
+            if (rsTwo.next()) {
+                return "S" + rsTwo.getInt(1) + "," + rsTwo.getString(2) + "," + rsTwo.getString(3) + "," + rsTwo.getString(4);
             }
         } catch (SQLException e) {
-            System.out.println("An error occurred while getting user data: " + e.getMessage());
-            return "";
+            System.out.println("An error occurred while searching for user: " + e.getMessage());
         }
         return "";
     }
@@ -590,5 +594,5 @@ public class Database {
             return "Store added failed: " + e.getMessage();
         }
     }
-    
+
 }
