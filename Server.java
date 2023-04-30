@@ -26,7 +26,8 @@ public class Server {
     private static String removeProduct = "14"; //command index to remove a product
     private static String addProductBySeller = "15"; //command index to add a product
     private static String searchPurchaseHistoryByStoreId = "16"; //command index to search purchase history related to a store
-    private static String dataBasePath = "C://tmp//CSproject5//CSproject5//Database1.accdb";
+    private static String dataBasePath =
+            "C://Users//owenw//Desktop//Proj5//src//Database1.accdb";
     private static int port = 4242;
     private static Database db;
 
@@ -122,22 +123,22 @@ public class Server {
                         // handle request from CustomerClient to search for a certain product
                         String searchWord = request.substring(2).toLowerCase(); // remove "04" and convert to lowercase
                         String response = db.searchProducts(searchWord);
-                        out.print(response);
+                        out.println(response);
                         out.flush();
                     } //Done "vo" "1,Vodka,5,Vodka alcohol 1L bottle,49,100.0@2,Vodka,3,Vodka alcohol 1L bottle,24,125.0@"
                     else if (request.substring(0,2).equals(searchCartByID)) {
                         System.out.println("Processing searchCartByID...");
                         String id = request.substring(2);
                         String cartString = db.searchCartByCustomer(id); // getting info in array list
-                        out.print(cartString);
+                        out.println(cartString);
                         out.flush();
                     } //Done "13", could send empty "10,1,Vodka,2,7,100.0@"
                     else if (request.substring(0, 2).equals(updateProduct)) {
                         System.out.println("Processing updateProduct...");
                         String choice = request.substring(2);
                         // choice example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100,1
-                        String response = db.updateProduct(choice);
-                        out.print(response);
+                        String message = db.updateProduct(choice);
+                        out.println(message);
                         out.flush();
                     } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7"
                     else if (request.substring(0, 2).equals(updateHistory)) {
@@ -146,7 +147,7 @@ public class Server {
                         String storeName = db.getStoreName(purchaseInfo);
                         purchaseInfo = purchaseInfo + "," + storeName;
                         String message = db.addPurchaseHistory(purchaseInfo);
-                        out.print(message);
+                        out.println(message);
                         out.flush();
                     } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3" message
                     else if (request.substring(0, 2).equals(listAllProducts)) {
@@ -156,16 +157,10 @@ public class Server {
                         out.println(productList);
                         out.flush();
                     } //Done None "1,Vodka,5,Vodka alcohol 1L bottle,49,100@2,Vodka,3,Vodka alcohol 1L bottle,24,125"
-                    else if (request.substring(0, 2).equals(purchaseProduct)) {
-                        System.out.println("Processing purchaseProduct...");
-                        String purchaseMessage = db.updateProduct(request);
-                        out.println(purchaseMessage);
-                        out.flush();
-                    } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,1" message
                     else if (request.substring(0, 2).equals(addToCart)) {
                         System.out.println("Processing addToCart...");
                         String purchaseInfo = request.substring(2);
-                        String message = db.updateProduct(purchaseInfo);
+                        String message = db.addToCart(purchaseInfo);
                         out.println(message);
                         out.flush();
                     } //Done "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,2" message
