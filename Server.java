@@ -1,9 +1,6 @@
-package Project5;
-
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 /**
  * This is the Server class that will create connection and interact with the database.
  * This is a simple version that show how this class can be written for now.
@@ -30,7 +27,7 @@ public class Server {
     private static String addStore = "17";
     private static String loadMarkets = "18";
     private static String dataBasePath =
-            "";
+            "C://Users//Q1892//IdeaProjects//MyProjects//src//Project5//Database1.accdb";
     private static int port = 4242;
     private static Database db;
 
