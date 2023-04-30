@@ -7,6 +7,7 @@ Command Index: 08
   I would like it to match with the the actual database, so the server can add the quantity of item and price of item to the cart
 
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +15,16 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Test {
+    public static void main(String[] args) {
+        Database db = new Database("C://tmp//CSproject5//CSproject5//Database1.accdb");
+
+        String purchaseInfo = "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3";
+        String response = db.searchPurchaseHistoryByStoreId("5");
+        System.out.println(response);
+    }
+
+
+    /*
     public static void main(String[] args) throws IOException {
         // create a socket to connect to the server
         Socket socket = new Socket("localhost", 4242);
@@ -31,5 +42,6 @@ public class Test {
         // read the response from the server
         String response = in.readLine();
         System.out.println(response);
-    }
+    }*/
 }
+
