@@ -1,0 +1,53 @@
+CUSTOMER TESTS
+  
+  Lauching Application:
+    Steps:
+       1) Run the Server and Marketplace classes
+
+    Expected result: Application offers the user an option to login or create account. 
+
+    Test Status: Passed. 
+    
+    
+  Creating Account:
+    Steps:
+      1) launch application
+      2) Click create account option in GUI
+      3) enter unique username
+      4) enter password and real name
+      5) choose account priveleges
+      
+    Expected result: account is created and user is taken to the login screen
+    
+    Test Status: Passed
+    
+   
+  Adding to cart/buying items
+    Steps:
+      1) launch application
+      2) login (or create account)
+      3) Select either "Search" or "View Market" from drop down menu and enter
+          (a) if "Search" -> enter a search term
+          (b) if "View Market" -> nothing else is necessary
+      4) Select product from drop down menu
+      5) choose buy or add to cart option
+      6) enter quantity and enter
+      7) return to homescreen
+   
+   Expected Result: Database updated to add item to cart or buy the product and update its quantity
+   
+   Test Status: Passed
+   
+ Sorting Products:
+    Steps:
+      1) launch application and login/create new account
+      2) select "Sort Products" from drop down menu and enter
+      3) Choose to sort products by quantity or price
+      4) return to menu and select "View Market" to see the sorted products
+      
+    Expected Result: sort products correctly and show results when user selects "View Market"
+    
+    Test Status: Passed (Notice that the items will only stay sorted immediatly after; 
+        if another choice is run (besides sort) the products will go back to natural order)
+        
+  Export History: 
