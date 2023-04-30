@@ -1,3 +1,4 @@
+package Project5;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -256,8 +257,41 @@ public class Database {
                 String buyerId = rs.getString("Buyer_ID");
                 int productQuantity = rs.getInt("Product_Quantity");
                 double productPrice = rs.getDouble("Product_Price");
+                int storeID = rs.getInt("Store_ID");
 
-                String row = id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice;
+                String row = id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice + "," + storeID;
+                result += row + "@";
+            }
+        } catch (Exception e) {
+            System.out.println("Error executing query: " + e);
+            result = "";
+        }
+
+        return result;
+    }
+
+    /**
+     * this method will return the cart information of a store
+     * by taking in the storeId
+     * @param storeId the ID of the store
+     * @return a string information contains the cart items like "10,1,Vodka,2,7,100.0,5@11,1,Vodka,2,7,100.0,5@"
+     */
+    public String searchCartByStoreID(String storeId) {
+        String result = "";
+        try {
+            Statement statement = con.createStatement();
+            String query = "SELECT * FROM Cart WHERE Store_ID = '" + storeId + "'";
+            ResultSet rs = statement.executeQuery(query);
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                int productId = rs.getInt("Product_ID");
+                String productName = rs.getString("Product_Name");
+                String buyerId = rs.getString("Buyer_ID");
+                int productQuantity = rs.getInt("Product_Quantity");
+                double productPrice = rs.getDouble("Product_Price");
+
+                String row = id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice + "," + storeId;
                 result += row + "@";
             }
         } catch (Exception e) {
@@ -304,16 +338,18 @@ public class Database {
         try {
             int productID = Integer.parseInt(itemInfo[0]);
             String productName = itemInfo[1];
+            int storeID = Integer.parseInt(itemInfo[2]);
             int quantity = Integer.parseInt(itemInfo[6]);
             double price = Double.parseDouble(itemInfo[5]);
             int customerID = Integer.parseInt(itemInfo[7]);
 
-            PreparedStatement ps = con.prepareStatement("INSERT INTO Cart(Product_ID, Product_Name, Buyer_ID, Product_Quantity, Product_Price) VALUES (?, ?, ?, ?, ?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO Cart(Product_ID, Product_Name, Buyer_ID, Product_Quantity, Product_Price, Store_ID) VALUES (?, ?, ?, ?, ?, ?)");
             ps.setInt(1, productID);
             ps.setString(2, productName);
             ps.setInt(3, customerID);
             ps.setInt(4, quantity);
             ps.setDouble(5, price);
+            ps.setInt(6, storeID);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected == 1) {
@@ -558,5 +594,6 @@ public class Database {
             return "Store added failed: " + e.getMessage();
         }
     }
+
 
 }
