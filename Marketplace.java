@@ -1,4 +1,3 @@
-
 import javax.swing.JOptionPane;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -12,21 +11,17 @@ import java.net.Socket;
 /**
  * This is the entry of the program, it will determine the user type and
  * pass the Database object and the Server connection to whether CustomerClient or SellerClient
- * @version 1.4 2020/4/28
+ * @version 1.5 2020/4/30
  * @author Libin Chen
  */
 public class Marketplace {
     private static String goodbyeMessage = "Thanks for using our App! Goodbye!";
     private static String getUserData = "01"; //command index to tell the Server to get user data
     private static String addUserData = "02"; //command index to tell the Server to add user data
-
-    private static String dataBasePath =
-            "C://tmp//CSproject5//CSproject5//Database1.accdb";
     private static String hostName = "localhost";
-    private static int port = 123;
+    private static int port = 4242;
 
     public static void main(String[] args) {
-
 
         // create a connection to the server
         try (Socket socket = new Socket(hostName, port)) {
@@ -86,21 +81,22 @@ public class Marketplace {
                     return false;
                 }
             } else { // if there is an account matched
-                JOptionPane.showMessageDialog(null, "Username: " + response);
                 if (response.startsWith("S")) {
-                    JOptionPane.showMessageDialog(null, "run SellerClient");
+                    JOptionPane.showMessageDialog(null, "Welcome Seller!");
                     // response starts with "S"
                     SellerClient client = new SellerClient(socket, response.substring(1), in, out); // pass the account information accordingly
-                    //client.start(); // start the client
+                    boolean success = client.start(); // start the client
+                    if (!success) {
+                        return false;
+                    }
                 } else if (response.startsWith("C")) {
-                    JOptionPane.showMessageDialog(null, "run CustomerClient");
+                    JOptionPane.showMessageDialog(null, "Welcome Customer!");
                     // response starts with "C"
                     CustomerClient client = new CustomerClient(socket, response.substring(1), in, out); // pass the account information accordingly
-                    //boolean success = client.start(); // start the client
-                    //if (!success) {
-                    //    return false;
-                    //}
-                    client.run();
+                    boolean success = client.start(); // start the client
+                    if (!success) {
+                        return false;
+                    }
 
                 }
                 break;
