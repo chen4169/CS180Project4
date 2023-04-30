@@ -1,3 +1,4 @@
+package Project5;
 
 import javax.swing.*;
 import java.io.*;
@@ -19,15 +20,17 @@ public class Server {
     private static String updateHistory = "07";
     private static String addToCart = "08";
     private static String listAllProducts = "09";
-    private static String purchaseProduct = "10"; //command index to purchase a product
+    private static String searchCartByStoreID = "10";
     private static String deleteCartItem = "11" ;//command index to delete a cart item
     private static String searchProductsByStoreID = "12"; //command index to search product belong to a seller
     private static String searchMarketsBySellerId = "13"; //command index to search stores belong to a seller
     private static String removeProduct = "14"; //command index to remove a product
     private static String addProductBySeller = "15"; //command index to add a product
     private static String searchPurchaseHistoryByStoreId = "16"; //command index to search purchase history related to a store
+    private static String addStore = "17";
+    private static String loadMarkets = "18";
     private static String dataBasePath =
-            "C://Users//owenw//Desktop//Proj5//src//Database1.accdb";
+            "";
     private static int port = 4242;
     private static Database db;
 
@@ -36,7 +39,7 @@ public class Server {
         boolean isValidPath = false;
         while (!isValidPath) {
             if (dataBasePath.equals("")) { // if the database address is empty
-                dataBasePath = JOptionPane.showInputDialog(null, "Enter the database path", "Marketplace initialization",
+                dataBasePath = JOptionPane.showInputDialog(null, "Enter the database path separated by '//'", "Marketplace initialization",
                         JOptionPane.QUESTION_MESSAGE);
                 if (dataBasePath == null) { // if the user click the cross sign "x", end the program
                     JOptionPane.showMessageDialog(null, "Program terminated.");
@@ -116,7 +119,6 @@ public class Server {
                         String historyString = String.join("@", purchaseHistory); // convert to a string separated by @
                         out.println(historyString); // sent the string to client
                         out.flush(); // ensure that all data is sent immediately
-                        // historyString example: "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
                     } //Done  "13", could send empty "1,100,Apple,1,Walmart,5,2,0.99@2,101,Banana,2,Target,5,3,1.25@4,103,Carrot,4,Kroger,5,4,0.75"
                     else if (request.substring(0, 2).equals(productSearchEngine)) {
                         System.out.println("Processing productSearchEngine...");
@@ -167,7 +169,7 @@ public class Server {
                     else if (request.substring(0, 2).equals(deleteCartItem)) {
                         System.out.println("Processing deleteCartItem...");
                         String itemID = request.substring(2);
-                        String message = db.updateProduct(itemID);
+                        String message = db.deleteCartItem(itemID);
                         out.println(message);
                         out.flush();
                     } //Done "1" message
@@ -202,10 +204,28 @@ public class Server {
                     else if (request.substring(0, 2).equals(searchPurchaseHistoryByStoreId)) {
                         System.out.println("Processing searchPurchaseHistoryByStoreId...");
                         String historyInfo = request.substring(2);
-                        String response = db.addProductBySeller(historyInfo);
+                        String response = db.searchPurchaseHistoryByStoreId(historyInfo);
                         out.println(response);
                         out.flush();
                     } //Done "5" "1,5,7,3,100.0,Vodka,NC,14"
+                    else if (request.substring(0, 2).equals(searchCartByStoreID)) {
+                        System.out.println("Processing searchCartByStoreID...");
+                        String response = db.searchCartByStoreID(request.substring(2));
+                        out.println(response);
+                        out.flush();
+                    } //Done "5" "10,1,Vodka,2,7,100.0,5@"
+                    else if (request.substring(0, 2).equals(addStore)) {
+                        System.out.println("Processing addStore...");
+                        String message = db.addMarket(request.substring(2));
+                        out.println(message);
+                        out.flush();
+                    } //Done "aStore,1" message
+                    else if (request.substring(0, 2).equals(loadMarkets)) {
+                        System.out.println("Processing loadMarkets...");
+                        String response = db.loadMarkets();
+                        out.println(response);
+                        out.flush();
+                    } //Done None "1,CS shop,1@2,Carnitas,3@3,CVS,2@4,Target,1@5,NC,2@6,CS,1@"
                 } // while loop
             } catch (Exception e) {
                 System.out.println("Error handling client request: " + e);
