@@ -38,6 +38,7 @@ CUSTOMER TESTS
    
    Test Status: Passed
    
+   
  Sorting Products:
     Steps:
       1) launch application and login/create new account
@@ -50,4 +51,30 @@ CUSTOMER TESTS
     Test Status: Passed (Notice that the items will only stay sorted immediatly after; 
         if another choice is run (besides sort) the products will go back to natural order)
         
-  Export History: 
+  Editing User Cart:
+      Steps:
+        1) launch application and login
+        2) select "View Cart" from drop down
+        3) select a product from the drop down of items in the cart
+        4) choose to remove or buy item
+        
+    Expected Results: Either purchase or remove product from cart (item is also removed after it is purchased from the cart)
+    
+    Test Status: Passed
+    
+    
+    Export History:
+      Steps: 
+        1) Launch application and login
+        2) select export history from menu drop down
+        3) enter the name of the file you want to export history to (before the ".csv")
+        4) close the program (through cancel options)
+        
+   Expected Results:  After program is closed the file will appear within the directory, along with a key so the user can read the information
+   
+   Test Status: Passed
+   
+   
+   
+   
+SELLER TESTS:
