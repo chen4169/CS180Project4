@@ -26,6 +26,7 @@ public class Database {
         String url = "jdbc:ucanaccess://" + filepath;
         try {
             this.con = DriverManager.getConnection(url);
+            System.out.println("Database initialized successfully.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -35,7 +36,7 @@ public class Database {
      * This method will search Sellers and Buyers table in the database
      * and return a string of all the information asociated with the username
      * @param username the username of an account
-     * @return A string that contains all the information of an acccount
+     * @return A string that contains all the information of an account
      */
     public String getUserData(String username) {
         String query = "SELECT * FROM Buyers WHERE Buyer_Username = ? UNION SELECT * FROM Sellers WHERE Seller_Username = ?";
@@ -93,20 +94,26 @@ public class Database {
     }
 
     /**
-     * This method will search the purchase history of a certain costomer by the ID
+     * This method will search the purchase history of a certain customer by the ID
      * and return a string array contains "OrderID,Product_ID,Product_Name,Store_ID,Store_Name,Buyer_ID,Quantity,Product_Price"
      * separated by a ",". For example: ["1,100,Apple,1,Walmart,5,2,0.99", "2,101,Banana,2,Target,5,3,1.25", "4,103,Carrot,4,Kroger,5,4,0.75"]
      * @param buyerID the ID of the Customer to be searched
      * @return a string array contains the desired information
-     * @throws SQLException the call function need to handle this exception
+     * @throws SQLException the calling function needs to handle this exception
      */
-    public String[] searchPurchaseHistoryByBuyerID(int buyerID) {
+    public String[] searchPurchaseHistoryByBuyerID(String buyerID) {
+        int customerID;
         String[] purchaseHistory = new String[0];
-        String query = "SELECT * FROM PurchaseHistory WHERE Buyer_ID=" + buyerID;
+        try {
+            customerID = Integer.parseInt(buyerID);
+        } catch (Exception e) {
+            return purchaseHistory;
+        }
+        String query = "SELECT * FROM PurchaseHistory WHERE Buyer_ID=" + customerID;
         try (Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                String orderID = rs.getString("Order_ID");
+                String orderID = rs.getString("OrderID");
                 String productID = rs.getString("Product_ID");
                 String productName = rs.getString("Product_Name");
                 String storeID = rs.getString("Store_ID");
@@ -199,6 +206,11 @@ public class Database {
         }
     }
 
+    /**
+     * This method will update the quantity of a product
+     * @param choice a product to be updated, example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100,1
+     * @return a String message
+     */
     public synchronized String updateProduct(String choice) {
         String[] fields = choice.split(",");
         String productId = fields[0];
@@ -224,26 +236,44 @@ public class Database {
         }
     }
 
-
-    public ArrayList<String> searchCart(String buyerId) {
-        ArrayList<String> cartData = new ArrayList<String>();
+    /**
+     * this method will return the cart information of a certain customer
+     * by taking in the buyerID
+     * @param customerId the ID of the customer
+     * @return
+     */
+    public String searchCartByCustomer(String customerId) {
+        String result = "";
         try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Cart WHERE Buyer_Id = '" + buyerId + "'");
+            Statement statement = con.createStatement();
+            String query = "SELECT * FROM Cart WHERE Buyer_ID = '" + customerId + "'";
+            ResultSet rs = statement.executeQuery(query);
 
             while (rs.next()) {
-                String cartId = rs.getString("Id");
-                String productId = rs.getString("Product_ID");
-                String cartInfo = String.join(",", cartId, buyerId, productId);
-                cartData.add(cartInfo);
+                int id = rs.getInt("id");
+                int productId = rs.getInt("Product_ID");
+                String productName = rs.getString("Product_Name");
+                String buyerId = rs.getString("Buyer_ID");
+                int productQuantity = rs.getInt("Product_Quantity");
+                double productPrice = rs.getDouble("Product_Price");
+
+                String row = id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice;
+                result += row + "@";
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Error executing query: " + e);
+            result = "";
         }
-        return cartData;
+
+        return result;
     }
-    public ArrayList<String> loadMarkets() {
-        ArrayList<String> marketData = new ArrayList<>();
+
+    /**
+     * this method will load all the stores in the market
+     * @return a string separated by a "@" of all stores
+     */
+    public String loadMarkets() {
+        String result = "";
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM Markets");
@@ -252,92 +282,166 @@ public class Database {
                 String storeName = rs.getString("Store_name");
                 String sellerId = rs.getString("Seller_ID");
                 String marketInfo = String.join(",", storeId, storeName, sellerId);
-                marketData.add(marketInfo);
+                result += marketInfo + "@";
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return marketData;
-    }
-    public void addToCart(String buyerID, String productID) {
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "INSERT INTO Cart (Buyer_ID, Product_ID) VALUES ('" + buyerID + "', '" + productID + "')";
-            stmt.executeUpdate(sql);
-            System.out.println("Product added to cart successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void emptyCart (){
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "TRUNCATE TABLE Cart";
-            stmt.executeUpdate(sql);
-            System.out.println("Cart table emptied successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void addPurchaseHistory(String productID, String storeID, int quantity, String buyerID, double price) {
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "INSERT INTO PurchaceHistory (Product_ID, Store_ID, Quantity, Buyer_ID, Price) VALUES ('" + productID + "', '" + storeID + "', '" + quantity + "', '" + buyerID + "', '" + price + "')";
-            stmt.executeUpdate(sql);
-            System.out.println("Purchase history added successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return result;
     }
 
-    public boolean updateProductQuantity(String productId, int newQuantity) {
-        try {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Products WHERE Product_ID = '" + productId + "'");
+    /**
+     * this method will add product to the Cart table
+     * @param cartItem it should be like: 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,2
+     * @return a string message
+     */
+    public synchronized String addToCart(String cartItem) {
+        String[] itemInfo = cartItem.split(",");
+        if (itemInfo.length != 8) {
+            return "Invalid request format"; // invalid input format
+        }
 
-            if (rs.next()) {
-                int currentQuantity = rs.getInt("Quantity_available");
-                int updatedQuantity = currentQuantity - newQuantity;
-                if (updatedQuantity < 0) {
-                    return false;
-                } else {
-                    String sql = "UPDATE Products SET Quantity_available = " + updatedQuantity + " WHERE Product_ID = '" + productId + "'";
-                    stmt.executeUpdate(sql);
-                    System.out.println("Product quantity updated successfully.");
-                    return true;
-                }
+        try {
+            int productID = Integer.parseInt(itemInfo[0]);
+            String productName = itemInfo[1];
+            int quantity = Integer.parseInt(itemInfo[6]);
+            double price = Double.parseDouble(itemInfo[5]);
+            int customerID = Integer.parseInt(itemInfo[7]);
+
+            PreparedStatement ps = con.prepareStatement("INSERT INTO Cart(Product_ID, Product_Name, Buyer_ID, Product_Quantity, Product_Price) VALUES (?, ?, ?, ?, ?)");
+            ps.setInt(1, productID);
+            ps.setString(2, productName);
+            ps.setInt(3, customerID);
+            ps.setInt(4, quantity);
+            ps.setDouble(5, price);
+
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 1) {
+                return "Added to cart successfully!";
             } else {
-                System.out.println("Product not found.");
-                return false;
+                return "Error adding to cart.";
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            System.out.println("Error adding item to cart: " + e.getMessage());
+            return "Exception thrown";
         }
     }
 
-    public ArrayList<String> searchProductsByMarket(String marketChoice) {
-        ArrayList<String> productData = new ArrayList<>();
+    /**
+     * this method will delete a cart item
+     * @param id the cart id that will be deleted
+     * @return a string message
+     */
+    public synchronized String deleteCartItem(String id) {
         try {
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Products WHERE Store_ID='" + marketChoice + "'");
+            String query = "DELETE FROM Cart WHERE id = " + id;
+            int rowsAffected = stmt.executeUpdate(query);
+            if (rowsAffected == 0) {
+                return "No such an item";
+            } else {
+                return "Item deleted successfully";
+            }
+        } catch (SQLException e) {
+            System.out.println("Error deleting item from cart: " + e.getMessage());
+            return "Exception thrown";
+        }
+    }
+
+    /**
+     * this method will add purchase history by taking in a string
+     * @param purchaseInfo it is like
+     * "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3,CVS"
+     * they are product id, product name, store id, product description, available quantity, price,
+     * amount brought, buyer id, store, name
+     * @return a string message
+     */
+    public synchronized String addPurchaseHistory(String purchaseInfo) {
+        System.out.println(purchaseInfo);
+        String[] fields = purchaseInfo.split(",");
+        if (fields.length != 9) {
+            return "Invalid format";
+        }
+        try {
+            System.out.println("Purchase history running");
+            String query = "INSERT INTO PurchaseHistory (Product_ID, Store_ID, Quantity, Buyer_ID, Product_Price, Product_Name, Store_Name) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, Integer.parseInt(fields[0]));
+            pstmt.setInt(2, Integer.parseInt(fields[2]));
+            pstmt.setInt(3, Integer.parseInt(fields[6]));
+            pstmt.setInt(4, Integer.parseInt(fields[7]));
+            pstmt.setDouble(5, Double.parseDouble(fields[5]));
+            pstmt.setString(6, fields[1]);
+            pstmt.setString(7, fields[8]);
+            pstmt.executeUpdate();
+            return "Purchase history added successfully.";
+        } catch (SQLException e) {
+            System.err.println("Error adding purchase history: " + e.getMessage());
+            return "Exception thrown";
+        }
+    }
+
+    /**
+     * this method will get the store name by taking in a string
+     * @param purchaseInfo like "1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3"
+     * @return a string of the store name
+     */
+    public String getStoreName(String purchaseInfo) {
+        String[] fields = purchaseInfo.split(",");
+        if (fields.length != 8) {
+            return "Invalid format";
+        }
+        int storeId = Integer.parseInt(fields[2]);
+        try {
+            String query = "SELECT Store_name FROM Markets WHERE Store_ID=?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, storeId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storeName = rs.getString("Store_name");
+                return storeName;
+            } else {
+                return "Store not found";
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting store name: " + e.getMessage());
+            return "Exception thrown";
+        }
+    }
+
+    /**
+     * This method searches for products by market choice and returns a single string separated by "@".
+     * If any unexpected error occurs, an empty string will be returned.
+     * @param storeID the choice of market to search for products
+     * @return a single string separated by "@" containing the product data
+     */
+    public String searchProductsByStoreID(String storeID) {
+        StringBuilder result = new StringBuilder();
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Products WHERE Store_ID='" + storeID + "'");
             while (rs.next()) {
                 String productInfo = String.join(",", rs.getString("Product_ID"), rs.getString("Product_name"), rs.getString("Store_ID"), rs.getString("Product_description"), rs.getString("Quantity_available"), rs.getString("Price"));
-                productData.add(productInfo);
+                result.append(productInfo).append("@");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return "";
         }
-        return productData;
+        return result.toString();
     }
-
-    public ArrayList<String> searchMarketsBySellerId(String sellerId) {
+    /**
+     * This method searches for all markets owned by a certain seller by the ID and returns a string separated by "@"
+     * containing "Store_ID,Store_name,Seller_ID". For example: "1,Walmart,100@2,Target,100@4,Kroger,100".
+     * @param sellerId the ID of the seller who owns the markets to be searched
+     * @return a string separated by "@" containing the desired information
+     */
+    public String searchMarketsBySellerId(String sellerId) {
         ArrayList<String> marketData = new ArrayList<>();
         try {
             Statement stmt = con.createStatement();
             String sql = "SELECT * FROM Markets WHERE Seller_ID='" + sellerId + "'";
             ResultSet rs = stmt.executeQuery(sql);
-
             while (rs.next()) {
                 String storeId = rs.getString("Store_ID");
                 String storeName = rs.getString("Store_name");
@@ -348,54 +452,83 @@ public class Database {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return "";
         }
-        return marketData;
+        return String.join("@", marketData);
     }
 
-    public void removeProduct(int productIndex) {
+    /**
+     * This method will remove a product by product ID
+     * @param productIndex the product ID
+     */
+    public String removeProduct(String productIndex) {
         try {
             Statement stmt = con.createStatement();
             String sql = "DELETE FROM Products WHERE Product_ID = " + productIndex;
             int rowsAffected = stmt.executeUpdate(sql);
             if (rowsAffected == 0) {
-                System.out.println("No product found with ID " + productIndex);
+                return "No product found with ID " + productIndex;
             } else {
-                System.out.println("Product removed successfully.");
+                return "Product removed successfully.";
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return "";
         }
     }
 
-    public void addProductBySeller(String productId, String productName, String storeId, String productDescription, int productQuantity, double productPrice) {
+
+    public String addProductBySeller(String productInfo) {
+        String[] productFields = productInfo.split(",");
+        if (productFields.length != 5) {
+            return "Invalid input: Expected 5 values separated by commas.";
+        }
+        String productName = productFields[0];
+        String storeId = productFields[1];
+        String productDescription = productFields[2];
+        int quantityAvailable = Integer.parseInt(productFields[3]);
+        double price = Double.parseDouble(productFields[4]);
+
         try {
             Statement stmt = con.createStatement();
-            String sql = "INSERT INTO Products (Product_ID, Product_name, Store_ID, Product_description, Quantity_available, Price) VALUES ('" + productId + "', '" + productName + "', '" + storeId + "', '" + productDescription + "', " + productQuantity + ", " + productPrice + ")";
+            String sql = "INSERT INTO Products (Product_name, Store_ID, Product_description, Quantity_available, Price) VALUES ('" + productName + "', '" + storeId + "', '" + productDescription + "', " + quantityAvailable + ", " + price + ")";
             stmt.executeUpdate(sql);
-            System.out.println("Product added successfully, want to continue editing stores?");
+            return "Product added successfully";
         } catch (SQLException e) {
-            e.printStackTrace();
+            return "Product added successfully" + e;
         }
     }
 
-    public void searchPurchaceHistoryByStoreId(String storeId) {
-        try {
-            String query = "SELECT * FROM PurchaceHistory WHERE Store_ID = ?";
-            PreparedStatement preparedStatement = con.prepareStatement(query);
-            preparedStatement.setString(1, storeId);
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
-                while (resultSet.next()) {
-                    System.out.println("ID: " + resultSet.getInt("ID") + ", Product_ID: " + resultSet.getInt("Product_ID") + ", Store_ID: " + resultSet.getInt("Store_ID") + ", Quantity: " + resultSet.getInt("Quantity") + ", Buyer_ID: " + resultSet.getInt("Buyer_ID") + ", Price: " + resultSet.getDouble("Price"));
-                }
-            } else {
-                System.out.println("No purchase history found for the given store ID: " + resultSet.getInt("Store_ID"));
+    public String searchPurchaseHistoryByStoreId(String storeId) {
+        StringBuilder purchaseHistoryData = new StringBuilder();
+        try {
+            Statement stmt = con.createStatement();
+            String sql = "SELECT * FROM PurchaseHistory WHERE Store_ID='" + storeId + "'";
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                int productId = rs.getInt("Product_ID");
+                int storeIdFromDb = rs.getInt("Store_ID");
+                int quantity = rs.getInt("Quantity");
+                int buyerId = rs.getInt("Buyer_ID");
+                double productPrice = rs.getDouble("Product_Price");
+                String productName = rs.getString("Product_Name");
+                String storeName = rs.getString("Store_Name");
+                int orderId = rs.getInt("OrderID");
+
+                String purchaseHistoryInfo = String.join(",", String.valueOf(productId), String.valueOf(storeIdFromDb), String.valueOf(quantity), String.valueOf(buyerId), String.valueOf(productPrice), productName, storeName, String.valueOf(orderId));
+                purchaseHistoryData.append(purchaseHistoryInfo).append("@");
+            }
+            if (purchaseHistoryData.length() > 0) {
+                purchaseHistoryData.deleteCharAt(purchaseHistoryData.length() - 1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return "";
         }
+        return purchaseHistoryData.toString();
     }
+
 
     public void addProduct (String name, int store, String description, int quantity, int price) {
         Statement st = null;
