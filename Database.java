@@ -1,7 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
