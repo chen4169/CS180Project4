@@ -1,5 +1,3 @@
-package Project5;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +5,7 @@ import java.util.List;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
- * @Version 2023/4/30 1.5
+ * @Version 2023/4/30 1.6
  * @author Libin Chen
  */
 
@@ -16,8 +14,6 @@ import java.util.List;
  */
 public class Database {
     private Connection con;
-    private String sellerCounter;
-    private String buyerCounter;
 
     /**
      * This method will create the connection with the database file by using filepath
@@ -497,7 +493,7 @@ public class Database {
      * This method will remove a product by product ID
      * @param productIndex the product ID
      */
-    public String removeProduct(String productIndex) {
+    public synchronized String removeProduct(String productIndex) {
         try {
             Statement stmt = con.createStatement();
             String sql = "DELETE FROM Products WHERE Product_ID = " + productIndex;
@@ -518,7 +514,7 @@ public class Database {
      * @param productInfo the product information like "red pen,5,a red pen,49,2.5"
      * @return a message
      */
-    public String addProductBySeller(String productInfo) {
+    public synchronized String addProductBySeller(String productInfo) {
         String[] productFields = productInfo.split(",");
         if (productFields.length != 5) {
             return "Invalid input: Expected 5 values separated by commas.";
@@ -578,7 +574,7 @@ public class Database {
      * @param storeInfo example "aStore,1"
      * @return a message
      */
-    public String addMarket (String storeInfo) {
+    public synchronized String addMarket (String storeInfo) {
         String[] storeField = storeInfo.split(",");
         if (storeField.length != 2) {
             return "Invalid input: Expected 2 values separated by commas.";
@@ -594,6 +590,5 @@ public class Database {
             return "Store added failed: " + e.getMessage();
         }
     }
-
-
+    
 }
