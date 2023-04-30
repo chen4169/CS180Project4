@@ -477,7 +477,11 @@ public class Database {
         }
     }
 
-
+    /**
+     * this method will add a product to the market
+     * @param productInfo the product information like "red pen,5,a red pen,49,2.5"
+     * @return a message
+     */
     public String addProductBySeller(String productInfo) {
         String[] productFields = productInfo.split(",");
         if (productFields.length != 5) {
@@ -495,11 +499,15 @@ public class Database {
             stmt.executeUpdate(sql);
             return "Product added successfully";
         } catch (SQLException e) {
-            return "Product added successfully" + e;
+            return "Product added failed" + e;
         }
     }
 
-
+    /**
+     * this will search the purchase history related to a store
+     * @param storeId the store id
+     * @return the purchase history string
+     */
     public String searchPurchaseHistoryByStoreId(String storeId) {
         StringBuilder purchaseHistoryData = new StringBuilder();
         try {
@@ -529,26 +537,25 @@ public class Database {
         return purchaseHistoryData.toString();
     }
 
-
-    public void addProduct (String name, int store, String description, int quantity, int price) {
-        Statement st = null;
-        String result = new String();
-        try {
-            st.executeQuery("INSERT INTO PRODUCTS ( Product_name, Store_ID, Product_description, " +
-                    "Quantity_available, price) Values ( \"" + name + "\", " + store + ", \"" + description + "\", "
-                    + quantity + ", "  + price + ")");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    /**
+     * this will add a store for a seller by a store name a seller id
+     * @param storeInfo example "aStore,1"
+     * @return a message
+     */
+    public String addMarket (String storeInfo) {
+        String[] storeField = storeInfo.split(",");
+        if (storeField.length != 2) {
+            return "Invalid input: Expected 2 values separated by commas.";
         }
-    }
-
-    public void addMarket (String name, int seller) {
-        Statement st = null;
-        String result = new String();
+        String storeName = storeField[0];
+        String SellerID = storeField[1];
         try {
-            st.executeQuery("INSERT INTO Markets ( Store_name, Seller_ID) Values ( \"" + name + "\", " + seller + ")");
+            Statement stmt = con.createStatement();
+            String sql = "INSERT INTO Markets (Store_name, Seller_ID) VALUES ('" + storeName + "', '" + SellerID + "')";
+            stmt.executeUpdate(sql);
+            return "Store added successfully.";
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return "Store added failed: " + e.getMessage();
         }
     }
 
