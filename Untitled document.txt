@@ -1,0 +1,74 @@
+﻿CS18000 - Problem Solving and Object-Oriented Programming
+
+
+
+
+
+
+Project 5 Report
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Written by: Owen Willis, Tommy Eggers, Libin Chen, Jaime Rueda.
+CS180 - Project 5 Report Part One: The Project and its Functionality
+For project 5 our team built upon the work that we had developed on project 4. We created a marketplace that allows sellers to create stores through which they can then list their products and customers to purchase them through the use of a cart system. The program is composed of three main components: a client, a server, and a database. The client side is then further divided into two different classes: Seller and Customer classes. The seller class is composed of a username, password, id, and name. This class is responsible for the creation and update of stores and products as well as signing into the server in order to identify which parts of the database can be manipulated. The implementation of the Seller class includes the display of the unique stores that belong to the seller, each store includes descriptions, quantities, and prices for all of the products that are sold. Through the implemented GUI, the seller has the ability to remove, update and add products, as well as view sales, and create a new store. The customer class which is composed of the same fields as the seller class. The customer through the GUI will be able to search for products, choose products, or view their cart. The cart is a list of all of the products that the user has searched for and wants to buy, this connects a customer to a product within a store which then will tell the seller if a purchase has been made and the quantity available will be reduced. On the server aspect we have the marketplace which is where all of the interactions of the client are received and then interprets what the user wants in order to retrieve, add or modify the information within the database. The marketplace could be considered a bridge between the client and the database as we don’t wish for each of the clients to be interacting with the database individually. The connection to the database is done through UCanAccess by giving the URL of the database. UCanAccess is an “open-source Java JDBC driver implementation that allows Java developers and JDBC client programs (e.g., DBeaver, NetBeans, SQLeo, OpenOffice Base, LibreOffice Base, Squirrel SQL) to read/write Microsoft Access databases.” (https://ucanaccess.sourceforge.net/site.html). With the connection established the server can then alter the database which is a set of tables that have specific fields of information as well as connections between the tables through the use of SQl which is a standardized programming language. Through the use of queries such as update, add and delete we can manipulate the information that is within the database which will then take care of making the connections and dependencies required in order to maintain the integrity of the program as well as simplifying the search of information as it will sort all of the data given and provide the desired results instead of having the server go through a file and read all the information extracting every desired piece of information.
+
+
+For this project there were a set of decisions which were crucial for the development of the project. The first decision that was made was which of the options we were going to go with for the development of the program. We chose the third option out of the rest because the development of a calendar would require to format dates and even though it is possible it seemed to be a task that was not worth taking compared to the others. On the other hand the messaging application would require to make all of the dependencies that the third option would need to a lesser degree and added to that a messaging app, meaning that the best option was to go for option 3. From there we took another of the biggest decisions for the development of the program, the utilization of a database. We used a database in order to help maintain sort and search through the information in an orderly manner. A database allows us to manipulate the data provided by the user in a more efficient manner as it means we don’t need to read a whole file over and over in order to find a specific set of information but instead ask for what is needed and produce a result more efficiently. Another decision we took was the utilization of sub functions for every single button in order to organize our program even better. This is something that we learned from project four as it lets everyone present understand better what the functionality of each of the procedures, as well as allow us to see if there are any mistakes which functions are the ones that are failing. We also decided to implement the shopping cart as this was something that would allow us in the database to create connections between the customer and the seller through the dependencies that are created within products and stores. This was also something that we believed would be the most understandable option to take since it is an option that all of us are familiar with and would allow us to do it through the database instead of having to utilize a different format or way of storing the data that is provided by any of the users. On the server end we decided that we would have to types of clients that are separate within their classes, the division and distinction of the seller and buyer on a complete different client aspect was a big decision as we did not want the options of a seller to be shown to the costumer as that would not only not make any sense but also would be extremely problematic for the database as the ID of the customer should not be allowed to create a store. The other way to do it would have been to make certain panes visible for a type of user however that would be a mess to code and could allow for multiple points within the program to create issues.
+
+
+CS180 - Project 5 Report Part Two: Individual Section
+Owen Willis
+
+
+Jaime Rueda
+For the project I took care of all the aspects that were necessary in order to create, connect and integrate a database into the project. The first step was to create the database that would be utilized. To create the database I used Microsoft access due to the integration through Ucanaccess that can be imported into IntelliJ. Once the file was created I created a table for each of the major components of the database which could be constituted as a table, this will allow us to determine what would be the characteristics of each of the classes. Once that is done I created the relationships between the tables in order to connect them and the main reason as to why we are using the database since we can filter the tables through the use of queries. Once the database was set up I integrated the database into Java through the Database class. This class when constructed will create a connection through Ucanaccess and allow java and the database to talk to one another. Furthermore, I was in charge of all of the SQL queries that are used within the code in order to facilitate all of the reading and searching within the information needed. I also developed part of the documentation for the program such as the written report and part of the requirements for the user to utilize the database. If I were to start over againI probably would have avoided the integration of the Database since even though the utilization for it is of great use and convenience the integration has been a constant uphill battle with the system. Not only that but most of our errors seem to occur with the fact that the file for some reason is not letting other people get access even though there should not be any restrictions of use. At this point it probably would have been easier to deal with the limitations of the CSV files instead of all the problems that have been created with the integration of the database. In addition to that I would probably prefer to develop more of the code and the server in a more organized manner when it comes to the connection as I think that it could have been better developed.
+Libin Chen
+
+
+Thomas Eggers
