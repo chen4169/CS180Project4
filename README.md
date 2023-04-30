@@ -16,3 +16,5 @@ Database – A class with methods to search information from the database, add p
 Server - A class that set up the network to handle request from multiple clients, it will create a Database object and use it accordingly. All the requests will be leading with a command index to indecate what the client want the Server to do. It will create a new thread if a new client try to connect to it.
 
 Marketplace – This class is the entry of the program, it has sign in and log in functions for the user to select and it will check if the user is a seller or customer then run the corresponding client class by passing the socket, in, and out objects, and the user informaton.
+
+CustomerClient - Handles the GUI aspect for a user of the customer type.  All inputs and ouputs are handled through a JOptionPane GUI.  All requests for informations are sent to the server and then the information is sent back from the server and interpretted within the CustomerClient class.  The CustomerClient has 5 options: Search, View Market, View Cart, Sort Products, and Export purchase history
