@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * This is the Server class that will create connection and interact with the database.
  * This is a simple version that show how this class can be written for now.
- * @Version 2023/4/28 1.6
+ * @Version 2023/4/30 1.7
  * @author Libin Chen
  */
 public class Server {
@@ -19,8 +19,9 @@ public class Server {
     private static String updateHistory = "07";
     private static String addToCart = "08";
     private static String listAllProducts = "09";
-    private static String dataBasePath = "C://Users//Q1892//IdeaProjects//MyProjects//src//Project5//Database1.accdb";
-    private static int port = 123;
+    private static String purchaseProduct = "10"; //command index to purchase a product
+    private static String dataBasePath = "C://tmp//CSproject5//CSproject5//Database1.accdb";
+    private static int port = 4242;
     private static Database db;
 
     public static void main(String[] args) throws IOException {
@@ -89,6 +90,7 @@ public class Server {
                         String username = request.substring(2);
                         String response = db.getUserData(username);
                         out.println(response);
+                        out.flush(); // ensure that all data is sent immediately
                     }
                     else if (request.substring(0, 2).equals(addUserData)) {
                         System.out.println("Processing addUserData...");
@@ -96,6 +98,7 @@ public class Server {
                         String userData = request.substring(2); // remove "02"
                         String response = db.addUserData(userData); // pass the user data as a single input string to the addUserData method
                         out.println(response);
+                        out.flush(); // ensure that all data is sent immediately
                     }
                     else if (request.substring(0, 2).equals(searchPurchaseHistoryByBuyerID)) {
                         System.out.println("Processing searchPurchaseHistoryByBuyerID...");
@@ -111,18 +114,9 @@ public class Server {
                         System.out.println("Processing productSearchEngine...");
                         // handle request from CustomerClient to search for a certain product
                         String searchWord = request.substring(2).toLowerCase(); // remove "04" and convert to lowercase
-                        ArrayList<String> matchingProducts = db.searchProducts(searchWord); // retrieve matching products from the database
-                        String results = "";
-
-                        for (String s: matchingProducts) {
-                            if (matchingProducts.indexOf(s) == matchingProducts.size() - 1) {
-                                results += s;
-                            } else {
-                                results += s + "//";
-                            }
-                        }
-
-                        out.print(results);
+                        String response = db.searchProducts(searchWord);
+                        System.out.println("Processing productSearchEngine..." + response);
+                        out.print(response);
                         out.flush();
                     }
                     else if (request.substring(0,2).equals(searchCartByID)) {
@@ -168,9 +162,6 @@ public class Server {
                         db.addPurchaseHistory(prodId, storeId, Integer.parseInt(quant),
                                 buyerId, Double.parseDouble(price));
                     }
-                    else if (request.substring(0, 2).equals(addToCart)) {
-                        // Witerawy woot wake fwom fowtnite
-                    }
                     else if (request.substring(0, 2).equals(listAllProducts)) {
                         System.out.println("Processing listAllProducts...");
                         // handle request from CustomerClient to list all products
@@ -178,14 +169,19 @@ public class Server {
                         out.println(productList);
                         out.flush();
                     }
+                    else if (request.substring(0, 2).equals(purchaseProduct)) {
+                        System.out.println("Processing purchaseProduct...");
+                        String purchaseMessage = db.updateProduct(request);
+                        out.println(purchaseMessage);
+                        out.flush();
+                    }
                 } // while loop
-
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.out.println("Error handling client request: " + e);
             } finally { // ensure the socket is closed regardless of whether an exception is thrown
                 try {
                     socket.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.out.println("Error closing socket: " + e);
                 }
             }
