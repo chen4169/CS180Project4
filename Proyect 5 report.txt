@@ -77,3 +77,21 @@ If I got a chance to redo the program for our project 5, I would like a differen
 
 
 Thomas Eggers
+
+	My contributions for project 5 consisted primarily with the SellerClient class. The role of this class was to provide an interface for sellers
+in which they would have the ability to view products within their stores, add and remove products from their stores, view sales from specific stores,
+and finally, view their products which were currently being held in customers’ shopping carts. For the display of this class, I opted to use
+JOptionPane for its entirety, which consisted of different sues such as error messaging, displaying seller choices through dropdown menus, and display
+of store products through JTables. The seller class from project four had lacked some of the functionality that was originally required, which made
+developing the SellerClient class a little more difficult than expected. New functionality such as viewing customer’s carts and viewing sales by
+stores were such functionalities that were not originally implemented, so they required some extra work and brainstorming on how they can be properly
+implemented into existing code. Among that, research on how to create and implement a JTable was burdensome, due to the fact that it was brand new,
+however it was the best choice of action in representing all the results of products within stores, because like your everyday store, they hold more
+than a few select products, so the list can get extensive, hence why the table would be best suited for organizing the information.
+	If I was given the opportunity to start the entire project over again, I would want to start with building an extremely strong foundation of
+what the team plans on doing with the project. This includes not only the option and what we will implement, but also assigning roles from the start,
+and creating clean, efficient code. For example, with the SellerClient, it had been rough fixing it up because the code was not implemented completely
+to begin with, so by creating a strong project 4, project 5 would realistically be a piece of cake, so to say. In terms of organizing meetings with
+the group, I think organizing a few more may be beneficial, but were able to get together when we needed to, so it worked out fine this time. Perhaps
+creating an agenda for meetings would be beneficial. The more structure we have with the project, the better, as I see it.
+
