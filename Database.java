@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * This class contains the methods to interact with the database file
  * Only the Server will use these methods
- * @Version 2023/4/28 1.4
+ * @Version 2023/4/30 1.5
  * @author Libin Chen
  */
 
@@ -61,7 +61,7 @@ public class Database {
      * @param request a string like "Susername,password,trueName" or "Cusername,password,trueName"
      * @return a String message
      */
-    public String addUserData(String request) {
+    public synchronized String addUserData(String request) {
         String[] userData = request.split(",");
         String userType = userData[0].substring(0, 1);
         String username = userData[0].substring(1);
@@ -128,12 +128,12 @@ public class Database {
 
     /**
      * This method will take a string to search any product that contains this string
-     * and return them as an ArrayList in which each element is separated by a ","
+     * and return them as a string in which each element is separated by a ","
      * @param searchWord the word used for searching matched products
-     * @return an ArrayList that contains the matched result
+     * @return a String that contains the matched result
      */
-    public ArrayList<String> searchProducts(String searchWord) {
-        ArrayList<String> result = new ArrayList<>();
+    public String searchProducts(String searchWord) {
+        StringBuilder result = new StringBuilder();
 
         try {
             // create the SQL statement
@@ -147,7 +147,7 @@ public class Database {
             // execute the query and get the results
             ResultSet rs = ps.executeQuery();
 
-            // iterate through the results and add them to the result ArrayList
+            // iterate through the results and add them to the result StringBuilder
             while (rs.next()) {
                 String productID = Integer.toString(rs.getInt("Product_ID"));
                 String productName = rs.getString("Product_name");
@@ -156,17 +156,19 @@ public class Database {
                 String quantityAvailable = Integer.toString(rs.getInt("Quantity_available"));
                 String price = Double.toString(rs.getDouble("Price"));
 
-                result.add(productID + "," + productName + "," + storeID + "," + productDescription + "," + quantityAvailable + "," + price);
+                result.append(productID).append(",").append(productName).append(",").append(storeID).append(",")
+                        .append(productDescription).append(",").append(quantityAvailable).append(",").append(price)
+                        .append("@");
             }
 
         } catch (SQLException e) {
-            // print the error message to the console and return an empty ArrayList
+            // print the error message to the console and return an empty string
             System.err.println("Error searching for products: " + e.getMessage());
-            return new ArrayList<String>();
+            return "";
         }
 
-        // return the result ArrayList
-        return result;
+        // return the result StringBuilder as a String
+        return result.toString();
     }
 
     /**
@@ -196,6 +198,33 @@ public class Database {
             return "";
         }
     }
+
+    public synchronized String updateProduct(String choice) {
+        String[] fields = choice.split(",");
+        String productId = fields[0];
+        int amountToBuy = Integer.parseInt(fields[fields.length - 1]);
+
+        try (Statement stmt = con.createStatement()) {
+            // Check if the product exists and has enough quantity available
+            ResultSet rs = stmt.executeQuery("SELECT Quantity_available FROM Products WHERE Product_ID = " + productId);
+            if (!rs.next()) {
+                return "Product not found";
+            }
+            int quantityAvailable = rs.getInt("Quantity_available");
+            if (quantityAvailable < amountToBuy) {
+                return "Not enough quantity available";
+            }
+
+            // Update the quantity available
+            int newQuantityAvailable = quantityAvailable - amountToBuy;
+            stmt.executeUpdate("UPDATE Products SET Quantity_available = " + newQuantityAvailable + " WHERE Product_ID = " + productId);
+            return "Order placed";
+        } catch (SQLException e) {
+            return "Product not found";
+        }
+    }
+
+
     public ArrayList<String> searchCart(String buyerId) {
         ArrayList<String> cartData = new ArrayList<String>();
         try {
