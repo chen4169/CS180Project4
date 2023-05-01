@@ -106,7 +106,7 @@ public class SellerClient {
                     products[i + 1][3] = productsWithDescriptions.get(i).substring(productsWithDescriptions.get(i).indexOf("3") + 2, productsWithDescriptions.get(i).indexOf("4") - 1);
                     products[i + 1][4] = productsWithDescriptions.get(i).substring(productsWithDescriptions.get(i).indexOf("4"));
                 }
-                
+
                 JOptionPane.showMessageDialog(null, products,
                         "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
 
@@ -307,32 +307,6 @@ public class SellerClient {
 
         return sellerChoice;
     }
-
-//    public static String productToRemoveInputDialog() {
-//        boolean redo;
-//        String productIndexText;
-//        do {
-//            do {
-//                productIndexText = JOptionPane.showInputDialog(null,
-//                        "Pick a product to remove by enter the product index:",
-//                        "Seller Menu - Remove Product", JOptionPane.QUESTION_MESSAGE);
-//                if ((productIndexText.isEmpty())) {
-//                    JOptionPane.showMessageDialog(null, "Product index cannot be empty!", "Seller Menu - Remove Product",
-//                            JOptionPane.ERROR_MESSAGE);
-//                }
-//            } while ((productIndexText.isEmpty()));
-//
-//            redo = false;
-//            try {
-//                Integer.parseInt(productIndexText);
-//            } catch (NumberFormatException e) {
-//                JOptionPane.showMessageDialog(null, "Please enter a valid product index!",
-//                        "Seller Menu - Remove Product", JOptionPane.ERROR_MESSAGE);
-//                redo = true;
-//            }
-//        } while (redo);
-//        return productIndexText;
-//    }
 
     public static void randomErrorMessageDialog() {
         JOptionPane.showMessageDialog(null, "Error, invalid input!", "Seller Menu",
