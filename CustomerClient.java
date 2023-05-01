@@ -5,7 +5,7 @@ import java.net.Socket;
 
 /**
  * This is a client class that provides the interface for a customer to exchange information with the server.
- * @Version 2023/5/1 1.6
+ * @Version 2023/4/30 1.4
  * @author Owen Willis, Libin Chen
  */
 public class CustomerClient {
@@ -77,11 +77,12 @@ public class CustomerClient {
                     out.flush();
                     productList = in.readLine();
                 } catch (IOException err) {
-                    JOptionPane.showMessageDialog(null, "Can't connect to the Server", "Internet issue", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Can't connect to the Server", 
+                            "Internet issue", JOptionPane.PLAIN_MESSAGE);
                     err.printStackTrace();
                     return false;
                 }
-                // example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100@2,Vodka,3,Vodka alcohol 1L bottle,24,125@3,tomato,1,A red fruit,100,5
+                // example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100@2,Vodka,3,Vodka alcohol 1L bottle,24,125
 
                 // parse the productList string
                 products = productList.split("@");
@@ -91,12 +92,13 @@ public class CustomerClient {
             //  USER CHOOSES WHAT THEY WANT TO DO
             choice = "";
             String[] options = {"Search", "View Market", "View Cart", "Sort Products", "Export History"};
-            choice = (String) JOptionPane.showInputDialog(null, "Search",
-                    "Search", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+            choice = (String) JOptionPane.showInputDialog(null, "Enter Choice",
+                        "Market", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
             // Choice Branch
             if (choice == null) {
-                JOptionPane.showMessageDialog(null, goodbyeMessage, "Market", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, goodbyeMessage, "Market", 
+                        JOptionPane.PLAIN_MESSAGE);
                 break;
             } else if (choice.equals("Search")) {
                 searchEngine(products);
@@ -147,7 +149,7 @@ public class CustomerClient {
 
         while (true) {
             searchWord = JOptionPane.showInputDialog(null, "Search",
-                    "Search", JOptionPane.QUESTION_MESSAGE);
+                    "Market", JOptionPane.QUESTION_MESSAGE);
 
             if (searchWord == null) {  // Cancelled
                 break;
@@ -160,124 +162,130 @@ public class CustomerClient {
         }
 
         if (searchWord != null) {
-            String[] results = searchProducts(searchWord, products);
-            JOptionPane.showMessageDialog(null, results);
+                String[] results = searchProducts(searchWord, products);
+                JOptionPane.showMessageDialog(null, results);
 
-            // Displaying results in dropdown window
-            String choice = (String) JOptionPane.showInputDialog(null, "Search",
-                    "Search", JOptionPane.PLAIN_MESSAGE, null, results, results[0]);
-            // example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100
-            JOptionPane.showMessageDialog(null, "choice = " + choice);
-            if (choice == null) {
-                return;
-            }
+                // Displaying results in dropdown window
+                String choice = (String) JOptionPane.showInputDialog(null, "Search",
+                        "Search", JOptionPane.PLAIN_MESSAGE, null, results, results[0]);
+                // example: 1,Vodka,5,Vodka alcohol 1L bottle,50,100
+                JOptionPane.showMessageDialog(null, "choice = " + choice);
 
-            // Choosing what to do with the product
-            Object[] options = {"Buy", "Add to Cart", "Cancel"};
-            int option = JOptionPane.showOptionDialog(null,
-                    "What would you like to do with the product?", "Search",
-                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                // Choosing what to do with the product
+                Object[] options = {"Buy", "Add to Cart", "Cancel"};
+                int option = JOptionPane.showOptionDialog(null,
+                        "What would you like to do with the product?", "Search",
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
-            // Quantity Available
-            int quantAvail = Integer.parseInt(choice.split(",")[4]);
+                // Quantity Available
+                int quantAvail = Integer.parseInt(choice.split(",")[4]);
 
-            if (option == 0) {  // BUYING
+                if (option == 0) {  // BUYING
 
-                // Getting amount
-                int amt = 0;
-                while (true) {
-                    try {
-                        String amtAsString = JOptionPane.showInputDialog(null, "Enter Quantity", "Market", JOptionPane.QUESTION_MESSAGE);
+                    // Getting amount
+                    int amt = 0;
+                    while (true) {
+                        try {
+                            String amtAsString = JOptionPane.showInputDialog(null, 
+                                    "Enter Quantity", "Market", JOptionPane.QUESTION_MESSAGE);
 
-                        if (amtAsString == null) { // USER CANCELLING
-                            break;
-                        } else {
-                            amt = Integer.parseInt(amtAsString);
+                            if (amtAsString == null) { // USER CANCELLING
+                                break;
+                            } else {
+                                amt = Integer.parseInt(amtAsString);
+                            }
+
+
+                            if (amt <= quantAvail) {  // if there is enough
+                                break;
+                            } else {  // if there isn't
+                                JOptionPane.showMessageDialog(null, "Not Enough Instock!", 
+                                        "Market", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } catch (Exception er) {
+                            JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", 
+                                    "Market", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+
+                    if (amt != 0) {
+                        JOptionPane.showMessageDialog(null, updateProduct + choice + "," + amt);
+                        out.println(updateProduct + choice + "," + amt);
+                        out.flush();
+                        try {
+                            String resp = in.readLine();
+                        } catch (IOException err) {
+                            err.printStackTrace();
                         }
 
+                        // UPDATING HISTORY -> FORMAT = 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3
+                        String[] c = choice.split(",");
+                        String request = updateHistory + choice + "," + amt + "," + id;
+                        out.println(request);
+                        out.flush();
 
-                        if (amt <= quantAvail) {  // if there is enough
-                            break;
-                        } else {  // if there isn't
-                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", "Market", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } catch (Exception er) {
-                        JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", "Market", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
-                if (amt != 0) {
-                    JOptionPane.showMessageDialog(null, updateProduct + choice + "," + amt);
-                    out.println(updateProduct + choice + "," + amt);
-                    out.flush();
-                    try {
-                        String resp = in.readLine();
-                    } catch (IOException err) {
-                        err.printStackTrace();
-                    }
-
-                    // UPDATING HISTORY -> FORMAT = 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3
-                    String[] c = choice.split(",");
-                    String request = updateHistory + choice + "," + amt + "," + id;
-                    out.println(request);
-                    out.flush();
-
-                    try {
-                        String resp = in.readLine();
-                    } catch (IOException err) {
-                        err.printStackTrace();
-                    }
-
-                    JOptionPane.showMessageDialog(null, "Order Placed" + ": " + choice, "Market", JOptionPane.PLAIN_MESSAGE);
-                } else {  // Order was cancelled
-                    JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", JOptionPane.PLAIN_MESSAGE);
-                }
-
-            } else if (option == 1) { // ADD TO CART
-                // Getting amount
-                int amt = 0;
-                while (true) {
-                    try {
-                        String amtAsString = JOptionPane.showInputDialog(null, "Enter Quantity", "Market", JOptionPane.QUESTION_MESSAGE);
-
-                        if (amtAsString == null) { // USER CANCELLING
-                            break;
-                        } else {
-                            amt = Integer.parseInt(amtAsString);
+                        try {
+                            String resp = in.readLine();
+                        } catch (IOException err) {
+                            err.printStackTrace();
                         }
 
-                        if (amt <= quantAvail) {  // if there is enough
-                            break;
-                        } else {  // if there isn't
-                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", "Market", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Order Placed" + ": " + choice, 
+                                "Market", JOptionPane.PLAIN_MESSAGE);
+                    } else {  // Order was cancelled
+                        JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", 
+                                JOptionPane.PLAIN_MESSAGE);
+                    }
+
+                } else if (option == 1) { // ADD TO CART
+                    // Getting amount
+                    int amt = 0;
+                    while (true) {
+                        try {
+                            String amtAsString = JOptionPane.showInputDialog(null, 
+                                    "Enter Quantity", "Market", JOptionPane.QUESTION_MESSAGE);
+
+                            if (amtAsString == null) { // USER CANCELLING
+                                break;
+                            } else {
+                                amt = Integer.parseInt(amtAsString);
+                            }
+
+                            if (amt <= quantAvail) {  // if there is enough
+                                break;
+                            } else {  // if there isn't
+                                JOptionPane.showMessageDialog(null, "Not Enough Instock!", 
+                                        "Market", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } catch (NumberFormatException er) {
+                            JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", 
+                                    "Market", JOptionPane.ERROR_MESSAGE);
                         }
-                    } catch (NumberFormatException er) {
-                        JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", "Market", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
-
-                if (amt != 0) {
-                    // TODO: Send request to server to add specified quantity to the cart
-                    String request = choice + "," + amt + "," + id;
-                    out.println("08" + request);
-                    out.flush();
-
-                    try {
-                        String resp = in.readLine();
-                    } catch (IOException err) {
-                        err.printStackTrace();
                     }
 
-                    JOptionPane.showMessageDialog(null, String.format("%d of %s added to cart!", amt, choice), "Market", JOptionPane.PLAIN_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", JOptionPane.PLAIN_MESSAGE);
-                }
 
-            } else { // CANCEL
-                JOptionPane.showMessageDialog(null, "Cancelling Order...", "Market",
-                        JOptionPane.PLAIN_MESSAGE);
-            }
+                    if (amt != 0) {
+                        String request = choice + "," + amt + "," + id;
+                        out.println("08" + request);
+                        out.flush();
+
+                        try {
+                            String resp = in.readLine();
+                        } catch (IOException err) {
+                            err.printStackTrace();
+                        }
+
+                        JOptionPane.showMessageDialog(null, String.format("%d of %s added to cart!",
+                                amt, choice), "Market", JOptionPane.PLAIN_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", 
+                                JOptionPane.PLAIN_MESSAGE);
+                    }
+
+                } else { // CANCEL
+                    JOptionPane.showMessageDialog(null, "Cancelling Order...", "Market",
+                            JOptionPane.PLAIN_MESSAGE);
+                }
 
         }
     }
@@ -298,7 +306,8 @@ public class CustomerClient {
                 int amt = 0;
                 while (true) {
                     try {
-                        String amtAsString = JOptionPane.showInputDialog(null, "Enter Quantity", "Market", JOptionPane.QUESTION_MESSAGE);
+                        String amtAsString = JOptionPane.showInputDialog(null, "Enter Quantity", 
+                                "Market", JOptionPane.QUESTION_MESSAGE);
 
                         if (amtAsString == null) { // USER CANCELLING
                             break;
@@ -310,17 +319,16 @@ public class CustomerClient {
                         if (amt <= quantAvail) {  // if there is enough
                             break;
                         } else {  // if there isn't
-                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", "Market", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", 
+                                    "Market", JOptionPane.ERROR_MESSAGE);
                         }
                     } catch (NumberFormatException er) {
-                        JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", "Market", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", 
+                                "Market", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 
                 if (amt != 0) {
-                    // TODO: send server request to specified quantity of product (amt)
-                    //    also add to purchase history
-
                     // UPDATING HISTORY -> FORMAT = 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3
                     String[] c = choice.split(",");
                     String request = updateHistory + choice + "," + amt + "," + id;
@@ -343,9 +351,11 @@ public class CustomerClient {
                         err.printStackTrace();
                     }
 
-                    JOptionPane.showMessageDialog(null, String.format("%d of %s bought!", amt, choice), "Market", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, String.format("%d of %s bought!", amt, choice), 
+                            "Market", JOptionPane.PLAIN_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", 
+                            JOptionPane.PLAIN_MESSAGE);
                 }
 
 
@@ -353,7 +363,8 @@ public class CustomerClient {
                 int amt = 0;
                 while (true) {
                     try {
-                        String amtAsString = JOptionPane.showInputDialog(null, "Enter Quantity", "Market", JOptionPane.QUESTION_MESSAGE);
+                        String amtAsString = JOptionPane.showInputDialog(null, "Enter Quantity",
+                                "Market", JOptionPane.QUESTION_MESSAGE);
 
                         if (amtAsString == null) { // USER CANCELLING
                             break;
@@ -365,16 +376,17 @@ public class CustomerClient {
                         if (amt <= quantAvail) {  // if there is enough
                             break;
                         } else {  // if there isn't
-                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", "Market", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", 
+                                    "Market", JOptionPane.ERROR_MESSAGE);
                         }
                     } catch (NumberFormatException er) {
-                        JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", "Market", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Error! Invalid Entry!", 
+                                "Market", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 
 
                 if (amt != 0) {
-                    // TODO: Send request to server to add specified quantity to the cart
                     String request = choice + "," + amt + "," + id;
                     out.println("08" + request);
                     out.flush();
@@ -385,16 +397,17 @@ public class CustomerClient {
                         err.printStackTrace();
                     }
 
-                    JOptionPane.showMessageDialog(null, String.format("%d of %s added to cart!", amt, choice), "Market", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, String.format("%d of %s added to cart!", amt, 
+                            choice), "Market", JOptionPane.PLAIN_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Order Canceled.", "Market", 
+                            JOptionPane.PLAIN_MESSAGE);
                 }
             }
         }
     }
 
     public void viewCart(String[] products) {
-        // TODO: Change to server request -> Request USER ID's cart
         out.println("05" + id);
         out.flush();
         try {
@@ -402,93 +415,147 @@ public class CustomerClient {
             String cartString = in.readLine();
             String[] cart = cartString.split("@");
 
-            if (cart.length > 0) {
-                String cartChoice = (String) JOptionPane.showInputDialog(null, "Search",
-                        "Market", JOptionPane.PLAIN_MESSAGE, null, cart, cart[0]);
+            if (!cart[0].isEmpty()) {
 
-                if (cartChoice != null) {  // If they don't cancel
+                Object[] options = {"Buy All", "Select Item", "Cancel"};
+                int option = JOptionPane.showOptionDialog(null,
+                        "What would you like to do with the product?", "Search",
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
-                    // Getting correct product based on the choice
-                    String prodId = cartChoice.split(",")[1];
-                    String choice = "";
-                    for (String s: products) {
-                        if (s.split(",")[0].equals(prodId)) {
-                            choice = s;
-                            break;
+                if (option == 0) {
+                    for (String product: cart) { // 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7
+                        String prodId = product.split(",")[1];
+                        String choice = "";
+                        for (String s : products) {
+                            if (s.split(",")[0].equals(prodId)) {
+                                choice = s;
+                                break;
+                            }
+                        }
+                        out.println(updateProduct + choice + "," + product.split(",")[4]);
+                        out.flush();
+
+                        try {
+                            in.readLine();
+                        } catch (IOException err) {
+                            err.printStackTrace();
+                        }
+
+                        out.println(updateHistory + choice + "," + product.split(",")[4] + "," + id);
+                        out.flush();
+
+                        try {
+                            in.readLine();
+                        } catch (IOException err) {
+                            err.printStackTrace();
+                        }
+
+                        String cartId = product.split(",")[0];
+                        out.println("11" + cartId);
+                        out.flush();
+
+                        try {
+                            in.readLine();
+                        } catch (IOException err) {
+                            err.printStackTrace();
                         }
                     }
+                    JOptionPane.showMessageDialog(null, "All Items Bought from Cart!",
+                            "Market", JOptionPane.INFORMATION_MESSAGE);
+
+                } else if (option == 1) { // Selecting an item
+
+                    String cartChoice = (String) JOptionPane.showInputDialog(null, "Search",
+                            "Market", JOptionPane.PLAIN_MESSAGE, null, cart, cart[0]);
+
+                    if (cartChoice != null) {  // If they don't cancel
+
+                        // Getting correct product based on the choice
+                        String prodId = cartChoice.split(",")[1];
+                        String choice = "";
+                        for (String s : products) {
+                            if (s.split(",")[0].equals(prodId)) {
+                                choice = s;
+                                break;
+                            }
+                        }
 
 
-                    int quantAvail = Integer.parseInt(choice.split(",")[4]);
+                        int quantAvail = Integer.parseInt(choice.split(",")[4]);
 
-                    String[] op = {"Buy", "Remove"};
-                    int buyOrCart = JOptionPane.showOptionDialog(null,
-                            "Would you like to Buy or Remove?", "Market", JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE, null, op, op[1]);
+                        String[] op = {"Buy", "Remove"};
+                        int buyOrCart = JOptionPane.showOptionDialog(null,
+                                "Would you like to Buy or Remove?", "Market", JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE, null, op, op[1]);
 
-                    if (buyOrCart == 0) { // BUYING
-                        int amt = Integer.parseInt(cartChoice.split(",")[4]);
+                        if (buyOrCart == 0) { // BUYING
+                            int amt = Integer.parseInt(cartChoice.split(",")[4]);
 
-                        if (amt <= quantAvail) {  // if there is enough
-                            // UPDATING HISTORY -> FORMAT = 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3
-                            String[] c = choice.split(",");
-                            String request = updateHistory + choice + "," + amt + "," + id;
-                            out.println(request);
-                            out.flush();
+                            if (amt <= quantAvail) {  // if there is enough
+                                // UPDATING HISTORY -> FORMAT = 1,Vodka,5,Vodka alcohol 1L bottle,50,100,7,3
+                                String[] c = choice.split(",");
+                                String request = updateHistory + choice + "," + amt + "," + id;
+                                out.println(request);
+                                out.flush();
 
-                            try {
-                                String resp = in.readLine();
-                            } catch (IOException err) {
-                                err.printStackTrace();
+                                try {
+                                    String resp = in.readLine();
+                                } catch (IOException err) {
+                                    err.printStackTrace();
+                                }
+
+                                // request = 06prodidQUANT -> UPDATING PRODUCT INFORMATION
+                                out.println(updateProduct + choice + "," + amt);
+                                out.flush();
+
+                                try {
+                                    String resp = in.readLine();
+                                } catch (IOException err) {
+                                    err.printStackTrace();
+                                }
+
+                                // Removing from cart after bought
+                                String cartId = cartChoice.split(",")[0];
+                                out.println("11" + cartId);
+                                out.flush();
+
+                                try {
+                                    String resp = in.readLine();
+                                } catch (IOException err) {
+                                    err.printStackTrace();
+                                }
+
+
+                                JOptionPane.showMessageDialog(null, String.format("%d of %s bought!", 
+                                        amt, choice), "Market", JOptionPane.PLAIN_MESSAGE);
+                            } else {  // if there isn't
+                                JOptionPane.showMessageDialog(null, "Not Enough Instock!", 
+                                        "Market", JOptionPane.ERROR_MESSAGE);
                             }
 
-                            // request = 06prodidQUANT -> UPDATING PRODUCT INFORMATION
-                            out.println(updateProduct + choice + "," + amt);
-                            out.flush();
 
-                            try {
-                                String resp = in.readLine();
-                            } catch (IOException err) {
-                                err.printStackTrace();
-                            }
-
-                            // Removing from cart after bought
+                        } else if (buyOrCart == 1) { // REMOVING
                             String cartId = cartChoice.split(",")[0];
                             out.println("11" + cartId);
                             out.flush();
 
                             try {
                                 String resp = in.readLine();
+                                JOptionPane.showMessageDialog(null, resp, "Server Response", 
+                                        JOptionPane.PLAIN_MESSAGE);
                             } catch (IOException err) {
                                 err.printStackTrace();
                             }
-
-
-
-                            JOptionPane.showMessageDialog(null, String.format("%d of %s bought!", amt, choice), "Market", JOptionPane.PLAIN_MESSAGE);
-                        } else {  // if there isn't
-                            JOptionPane.showMessageDialog(null, "Not Enough Instock!", "Market", JOptionPane.ERROR_MESSAGE);
-                        }
-
-
-                    } else if (buyOrCart == 1) { // REMOVING
-                        String cartId = cartChoice.split(",")[0];
-                        out.println("11" + cartId);
-                        out.flush();
-
-                        try {
-                            String resp = in.readLine();
-                            JOptionPane.showMessageDialog(null, resp, "Server Response", JOptionPane.PLAIN_MESSAGE);
-                        } catch (IOException err) {
-                            err.printStackTrace();
                         }
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Your Cart is Empty", "Market", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Your Cart is Empty", "Market", 
+                        JOptionPane.PLAIN_MESSAGE);
             }
         } catch (IOException err) {
-            JOptionPane.showMessageDialog(null, "Error Retrieving Cart", "Market", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error Retrieving Cart", "Market", 
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -525,7 +592,8 @@ public class CustomerClient {
                     index++;
                 }
             }
-            JOptionPane.showMessageDialog(null, "Market Sorted! Check 'View Market' to see.", "Market", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Market Sorted! Check 'View Market' to see.", 
+                    "Market", JOptionPane.INFORMATION_MESSAGE);
 
         }
     }
@@ -538,7 +606,6 @@ public class CustomerClient {
         if (!(exportFileName == null)) {
             exportFileName += ".csv";
 
-            // TODO: server request for history related to id -> store in ArrayList "history" below
             out.println("03" + id);
 
             try {
@@ -561,7 +628,8 @@ public class CustomerClient {
                             JOptionPane.ERROR_MESSAGE);
                 }
             } catch (IOException err) {
-                JOptionPane.showMessageDialog(null, "Error when retrieving History", "Market", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Error when retrieving History", 
+                        "Market", JOptionPane.ERROR_MESSAGE);
             }
 
         } else {
