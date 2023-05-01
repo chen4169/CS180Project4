@@ -7,8 +7,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * This is a client class that provides interface for a seller to exchange information with the server.
+ * This is a seller class that provides the interface for a seller to exchange information with the server.
+ * @Version 2023/4/30 1.2
+ * @author Thomas Eggers, Owen Willis
  */
+
 public class SellerClient {
     private static String searchCartByStoreID = "10";
     private static String searchProductsByStoreID = "12";
