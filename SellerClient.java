@@ -1,137 +1,202 @@
 import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 
 /**
  * This is a client class that provides interface for a seller to exchange information with the server.
  */
 public class SellerClient {
+    private final BufferedReader in;
+    private final PrintWriter out;
+    String id, username, password, trueName;
+    Database db;
+    Socket socket;
+    String sellerStoreChoice;
+    String[] singleMarket;
+    String storeId;
+    ArrayList<String> stores;
+    ArrayList<String> productsWithDescriptions;
+    ArrayList<String> sellerProductsWithID;
+    String[] sellerProducts;
 
-    public static void main(String[] args) {
+    public SellerClient(Socket socket, String userData, BufferedReader in, PrintWriter out) {
+        this.socket = socket;
+        String[] userDataArray = userData.split(",");
+        this.id = userDataArray[0];
+        this.username = userDataArray[1];
+        this.password = userDataArray[2];
+        this.trueName = userDataArray[3];
+        this.in = in;
+        this.out = out;
+    }
 
-        // seller interface
-        while (true) {
-            //TODO: put into GUI
-            int storeCounter = 1;
-            ArrayList<String> stores = db.searchMarketsBySellerId(sellerId);
-            String[] singleMarket;
-            for (String store : stores) {
-                System.out.printf("[%d]  STORE NAME\n", storeCounter);
-                singleMarket = store.split(","); // an array of a product with info
-                System.out.printf("---------[%d]---------\n", storeCounter);
-                System.out.println("Store ID: " + singleMarket[0]);
-                System.out.println("Store name: " + singleMarket[1]);
-                System.out.println("Seller ID: " + singleMarket[2]);
-                storeCounter++;
+    public boolean passwordTest() {
+        boolean correct = false; // status if the password is entered correctly
+        String inputPassword; // the input password
+
+        // prompt the user to enter password
+        while (!correct) {
+            inputPassword = JOptionPane.showInputDialog(null, "Enter password:");
+            if (inputPassword == null) {
+                // User clicked the "x" button, so end the program
+                String goodbyeMessage = "Thanks for using our App! Goodbye!";
+                JOptionPane.showMessageDialog(null, goodbyeMessage);
+                return false;
+            } else if (inputPassword.equals(password)) {
+                // Password is correct, so continue with the rest of the code
+                correct = true;
+            } else {
+                // Password is incorrect, so show an error message and prompt again
+                JOptionPane.showMessageDialog(null, "Incorrect password. Please try again.");
+            }
+        }
+        return true;
+    }
+
+    public boolean start() throws IOException {
+        boolean correct = passwordTest();
+        if (!correct) { // if the user click to exit
+            return false;
+        }
+
+        //-----------------------------------------Seller Interface---------------------------------------------------
+
+        try {
+
+            stores = ;//TODO: |DATABASE| need an arraylist that gives each store name and store ID for the seller. Format: "(store name) - Store ID: (store ID)"
+
+            String sellerChoice = sellerChoiceInputDialog(); //what the seller wants to do
+
+            if (sellerChoice.equals("View Products")) { // seller chooses to view products
+
+                singleMarket = new String[stores.size()]; //creates an empty market the size of the stores arraylist
+
+                for (String store : stores) {  //singleMarket is updated with stores from stores arraylist
+                    singleMarket = store.split(","); //splits the string by the commas to be inputted into the array
+                }
+
+                //dropdown menu JOptionPane that gives the choice in the format of (store name), Store ID: (store ID)
+                String sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
+                        "Select a Store To View",
+                        "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, singleMarket,
+                        singleMarket[0]);
+
+                String storeId = sellerStoreChoice.substring(sellerStoreChoice.indexOf(" " + 1)); //gets the store ID
+                String chosenStore = sellerStoreChoice.substring(0, sellerStoreChoice.indexOf(" ")); //gets the store name
+
+                productsWithDescriptions = ;//TODO: |DATABASE| get an arraylist of products pertaining to a specific store ID.
+                // TODO: Format: "(product ID)-1-(product name)-2-(description)-3-(quantity)-4-(price)"
+
+                String[][] products;
+                String[] columnNames;
+
+                products[0][0] = "Product ID"; //product id as title
+                products[0][1] = "Name"; //product name as title
+                products[0][2] = "Description"; //product description as title
+                products[0][3] = "Quantity"; //product quantity as title
+                products[0][4] = "Price"; //product price as title
+                //loops through product array and adds substrings to their position within the 2D array
+                for (int i = 0; i < productsWithDescriptions.size(); i++) {
+                    products[i + 1][0] = productsWithDescriptions.get(i).substring(0, productsWithDescriptions.get(i).indexOf("1") - 1);
+                    products[i + 1][1] = productsWithDescriptions.get(i).substring(productsWithDescriptions.get(i).indexOf("1") + 2, productsWithDescriptions.get(i).indexOf("2") - 1);
+                    products[i + 1][2] = productsWithDescriptions.get(i).substring(productsWithDescriptions.get(i).indexOf("2") + 2, productsWithDescriptions.get(i).indexOf("3") - 1);
+                    products[i + 1][3] = productsWithDescriptions.get(i).substring(productsWithDescriptions.get(i).indexOf("3") + 2, productsWithDescriptions.get(i).indexOf("4") - 1);
+                    products[i + 1][4] = productsWithDescriptions.get(i).substring(productsWithDescriptions.get(i).indexOf("4"));
+                }
+                
+                JOptionPane.showMessageDialog(null, products,
+                        "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+
+            } else if (sellerChoice.equals("Remove Products")) { // remove products option
+
+                sellerProductsWithID = ;//TODO: |DATABASE| get an arraylist of products pertaining to a specific store ID. Format: "(product name) - Product ID: (product ID)"  *formatted exactly*
+
+                sellerProducts = new String[sellerProductsWithID.size()]; //arraylist of products determines size of array
+
+                for (String line : sellerProductsWithID) { //products + ID are assigned to array by splitting the commas
+                    sellerProducts = line.split(",");
+                }
+
+                //drop down menu of what product the seller wants to remove
+                String sellerProductRemoval = (String) JOptionPane.showInputDialog(null,
+                        "Select a Product to Remove",
+                        "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, sellerProducts,
+                        sellerProducts[0]);
+
+                String productID = sellerProductRemoval.substring(sellerProductRemoval.indexOf(" " + 1)); //gets the product ID from the seller product choice
+
+                db.removeProduct(Integer.parseInt(productID)); //TODO: |DATABASE| remove product from the database by input of the product index
+
+            } else if (sellerChoice.equals("Add Products")) { // adds product
+
+                //adds stores from the arraylist to an array
+                for (String store : stores) {
+                    singleMarket = store.split(",");
+                }
+
+                //gets the store ID from the seller store choice, the store products will be added to
+                sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
+                        "Select a Store to Add Products",
+                        "Seller Menu - Add Products", JOptionPane.QUESTION_MESSAGE, null, singleMarket,
+                        singleMarket[0]);
+
+                storeId = sellerStoreChoice.substring(sellerStoreChoice.indexOf(" " + 1)); //store ID input
+                String productName = addProductNameInputDialog(); //product name input
+                String productDescription = addProductDescriptionInputDialog(); //product description input
+                int productQuantity = Integer.parseInt(addProductQuantityInputDialog()); //quantity input is turned into an INT
+                double productPrice = Double.parseDouble(addProductPriceInputDialog()); //price input is turned into an INT
+
+                String productId = db.getMaxProductId();//TODO: |DATABASE| get a new product ID, +1 from the current highest ID
+
+                //TODO: |DATABASE| add product to the database for the seller
+                db.addProductBySeller(productId, productName, storeId, productDescription, productQuantity, productPrice); //adds product to the databse
+
+            } else if (sellerChoice.equals("View Sales")) { // checking sales
+                //lists all the sellers stores, giving a dropdown menu to choose one to view details
+                sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
+                        "Select a Store",
+                        "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, singleMarket,
+                        singleMarket[0]);
+                storeId = sellerStoreChoice.substring(sellerStoreChoice.indexOf(" " + 1));
+                String storeName = sellerStoreChoice.substring(0, sellerStoreChoice.indexOf(" "));
+                String sellerSalesChoice = sellerSalesChoiceInputDialog();
+
+                if (sellerSalesChoice.equals("View Sales by Product")) {
+                    //TODO: "Product ID:" (product ID), "Number of Sales:" (number of sales)
+                } else if (sellerSalesChoice.equals("View Sales by Customer")) {
+                    //TODO: "Customer ID:" (customer ID), "Number of Products Purchased:" (number of products purchased)
+                }
+
+            } else if (sellerChoice.equals("View Products in Cart")) {
+
+                //TODO: view products in all customer carts
+
+            } else if (sellerChoice.equals("Quit")) { // Quits loop of program
+                thankYouMessageDialog(); //goodbye message window "Thank you for using the seller menu!"
             }
 
-            do {
-                String MarketChosenId = chooseStoreInputDialog();
-                try {
-                    int marketChosenIdInt = Integer.parseInt(MarketChosenId);
-                    if (marketChosenIdInt >= 0 && marketChosenIdInt <= storeCounter) {
-                        String[] marketChosen = null;
-                        ArrayList<String> foundProducts;
-                        foundProducts = db.searchProductsByMarket(MarketChosenId);
-                        if (foundProducts == null) {
-                            storeNotFoundMessageDialog();
-                        } else {
-                            storeCounter = 1;
-                            //TODO: put into GUI
-                            for (String line : foundProducts) {
-                                String[] singleProduct = line.split(",");
-                                System.out.printf("---------[%d]---------\n", storeCounter);
-                                System.out.println("Store: " + singleProduct[2]);
-                                System.out.println("Product ID: " + singleProduct[0]);
-                                System.out.println("Product Name: " + singleProduct[1]);
-                                System.out.println("Description: " + singleProduct[3]);
-                                System.out.println("Quantity: " + singleProduct[4]);
-                                System.out.println("Price: $" + singleProduct[5]);
-                                storeCounter++;
-                            }
-
-                            String sellerChoice = sellerChoiceInputDialog();
-                            if (sellerChoice.equals("Remove Products")) { // remove products
-                                int productIndex = Integer.parseInt(productToRemoveInputDialog());
-                                db.removeProduct(productIndex);
-                            } else if (sellerChoice.equals("Add Products")) { // add item
-                                //TODO: put into GUI
-                                for (String store : stores) {
-                                    System.out.printf("[%d]  STORE NAME\n", storeCounter);
-                                    singleMarket = store.split(","); // an array of a product with info
-                                    System.out.printf("---------[%d]---------\n", storeCounter);
-                                    System.out.println("Store ID: " + singleMarket[0]);
-                                    System.out.println("Store name: " + singleMarket[1]);
-                                    System.out.println("Seller ID: " + singleMarket[2]);
-                                    storeCounter++;
-                                }
-                                String storeId = addProductStoreIDInputDialog();
-                                String productName = addProductNameInputDialog();
-                                String productDescription = addProductDescriptionInputDialog();
-                                int productQuantity = Integer.parseInt(addProductQuantityInputDialog());
-                                double productPrice = Double.parseDouble(addProductPriceInputDialog());
-                                String productId = db.getMaxProductId();
-                                db.addProductBySeller(productId, productName, storeId, productDescription, productQuantity, productPrice);
-                            } else if (sellerChoice.equals("View Sales")) { // checking sales
-                                //TODO: implement this properly, drop down of stores which will provide history upon
-                                // selection
-                                for (String store : stores) {
-                                    singleMarket = store.split(","); // an array of stores
-                                    db.searchPurchaceHistoryByStoreId(singleMarket[0]);
-                                }
-                            } else if (sellerChoice.equals("Quit")) { // Quits loop of program
-                                thankYouMessageDialog(); //goodbye message window "Thank you for using the market!"
-                                return;
-                            }
-                        }
-                        break;
-                    }
-                } catch (Exception e) {
-                    randomErrorMessageDialog(); //Any exception that occurs throws an error "Error, invalid input!"
-                }
-            } while (true);
+        } catch (Exception e) {
+            randomErrorMessageDialog(); //Any exception that occurs throws an error "Error, invalid input!"
         }
-        thankYouMessageDialog(); //goodbye message window "Thank you for using the market!"
+        return true;
     }
 
     //--------------------------------------    GUI METHODS   ------------------------------------------------------
 
-    public static String addProductStoreIDInputDialog() {
-        boolean redo;
-        String storeIDText;
-        do {
-            do {
-                storeIDText = JOptionPane.showInputDialog(null, "Pick a store " +
-                        "to add product to (enter Store ID):", "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
-                if ((storeIDText == null) || (storeIDText.isEmpty())) {
-                    JOptionPane.showMessageDialog(null, "Store ID cannot be empty!",
-                            "Seller Menu - Add Product",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } while ((storeIDText == null) || (storeIDText.isEmpty()));
-
-            redo = false;
-            try {
-                Integer.parseInt(storeIDText);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid store ID!",
-                        "Seller Menu - Add Product", JOptionPane.ERROR_MESSAGE);
-                redo = true;
-            }
-        } while (redo);
-        return storeIDText;
-    }
-
     public static String addProductNameInputDialog() {
         String productNameText;
-            do {
-                productNameText = JOptionPane.showInputDialog(null, "Enter product name:",
-                        "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
-                if ((productNameText == null) || (productNameText.isEmpty())) {
-                    JOptionPane.showMessageDialog(null, "Product name cannot be empty!",
-                            "Seller Menu - Add Product",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } while ((productNameText == null) || (productNameText.isEmpty()));
+        do {
+            productNameText = JOptionPane.showInputDialog(null, "Enter product name:",
+                    "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
+            if ((productNameText.isEmpty())) {
+                JOptionPane.showMessageDialog(null, "Product name cannot be empty!",
+                        "Seller Menu - Add Product",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } while ((productNameText.isEmpty()));
 
         return productNameText;
     }
@@ -141,12 +206,12 @@ public class SellerClient {
         do {
             productDescriptionText = JOptionPane.showInputDialog(null,
                     "Enter product description:", "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
-            if ((productDescriptionText == null) || (productDescriptionText.isEmpty())) {
+            if ((productDescriptionText.isEmpty())) {
                 JOptionPane.showMessageDialog(null, "Product description cannot be empty!",
                         "Seller Menu - Add Product",
                         JOptionPane.ERROR_MESSAGE);
             }
-        } while ((productDescriptionText == null) || (productDescriptionText.isEmpty()));
+        } while ((productDescriptionText.isEmpty()));
 
         return productDescriptionText;
     }
@@ -158,12 +223,12 @@ public class SellerClient {
             do {
                 productQuantityText = JOptionPane.showInputDialog(null,
                         "Enter product quantity:", "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
-                if ((productQuantityText == null) || (productQuantityText.isEmpty())) {
+                if ((productQuantityText.isEmpty())) {
                     JOptionPane.showMessageDialog(null, "Product Quantity cannot be empty!",
                             "Seller Menu - Add Product",
                             JOptionPane.ERROR_MESSAGE);
                 }
-            } while ((productQuantityText == null) || (productQuantityText.isEmpty()));
+            } while ((productQuantityText.isEmpty()));
 
             redo = false;
             try {
@@ -190,12 +255,12 @@ public class SellerClient {
             do {
                 productPriceText = JOptionPane.showInputDialog(null,
                         "Enter product price:", "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
-                if ((productPriceText == null) || (productPriceText.isEmpty())) {
+                if ((productPriceText.isEmpty())) {
                     JOptionPane.showMessageDialog(null, "Product price cannot be empty!",
                             "Seller Menu - Add Product",
                             JOptionPane.ERROR_MESSAGE);
                 }
-            } while ((productPriceText == null) || (productPriceText.isEmpty()));
+            } while ((productPriceText.isEmpty()));
 
             redo = false;
             try {
@@ -216,81 +281,58 @@ public class SellerClient {
     }
 
 
-    private static final String[] sellerOptions = {"", "Remove Products", "Add Products",
-            "View Sales", "Quit"};
+    private static final String[] sellerOptions = {"", "View Products", "Remove Products", "Add Products",
+            "View Sales", "View Products in Cart", "Quit"};
 
     public static String sellerChoiceInputDialog() {
         String sellerChoice;
-        do {
-            sellerChoice = (String) JOptionPane.showInputDialog(null,
-                    "What would you like to do?(Select from dropdown menu options)",
-                    "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, sellerOptions,
-                    sellerOptions[0]);
-            if (sellerChoice == null || sellerChoice.equals("")) {
-                JOptionPane.showMessageDialog(null, "Choice cannot be empty!", "Seller Menu",
-                        JOptionPane.ERROR_MESSAGE);
-            }
 
-        } while (sellerChoice == null);
+        sellerChoice = (String) JOptionPane.showInputDialog(null,
+                "What would you like to do?",
+                "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, sellerOptions,
+                sellerOptions[0]);
 
         return sellerChoice;
     }
 
-    public static String chooseStoreInputDialog() {
-        boolean redo;
-        String storeIDText;
-        do {
-            do {
-                storeIDText = JOptionPane.showInputDialog(null, "Choose a store " +
-                        "(Enter store ID):", "Seller Menu", JOptionPane.QUESTION_MESSAGE);
-                if ((storeIDText == null) || (storeIDText.isEmpty())) {
-                    JOptionPane.showMessageDialog(null, "Store ID cannot be empty!", "Seller Menu",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } while ((storeIDText == null) || (storeIDText.isEmpty()));
+    private static final String[] sellerSalesChoices = {"", "View Sales by Product", "View Sales by Customer"};
 
-            redo = false;
-            try {
-                Integer.parseInt(storeIDText);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid store ID!",
-                        "Seller Menu", JOptionPane.ERROR_MESSAGE);
-                redo = true;
-            }
-        } while (redo);
-        return storeIDText;
+    public static String sellerSalesChoiceInputDialog() {
+        String sellerChoice;
+
+        sellerChoice = (String) JOptionPane.showInputDialog(null,
+                "What would you like to do?",
+                "Seller Menu - Sales", JOptionPane.QUESTION_MESSAGE, null, sellerSalesChoices,
+                sellerSalesChoices[0]);
+
+        return sellerChoice;
     }
 
-    public static String productToRemoveInputDialog() {
-        boolean redo;
-        String productIndexText;
-        do {
-            do {
-                productIndexText = JOptionPane.showInputDialog(null,
-                        "Pick a product to remove by enter the product index:",
-                        "Seller Menu - Remove Product", JOptionPane.QUESTION_MESSAGE);
-                if ((productIndexText == null) || (productIndexText.isEmpty())) {
-                    JOptionPane.showMessageDialog(null, "Product index cannot be empty!", "Seller Menu - Remove Product",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } while ((productIndexText == null) || (productIndexText.isEmpty()));
-
-            redo = false;
-            try {
-                Integer.parseInt(productIndexText);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid product index!",
-                        "Seller Menu - Remove Product", JOptionPane.ERROR_MESSAGE);
-                redo = true;
-            }
-        } while (redo);
-        return productIndexText;
-    }
-
-    public static void storeNotFoundMessageDialog() {
-        JOptionPane.showMessageDialog(null, "Store Not Found!", "Seller Menu",
-                JOptionPane.ERROR_MESSAGE);
-    }
+//    public static String productToRemoveInputDialog() {
+//        boolean redo;
+//        String productIndexText;
+//        do {
+//            do {
+//                productIndexText = JOptionPane.showInputDialog(null,
+//                        "Pick a product to remove by enter the product index:",
+//                        "Seller Menu - Remove Product", JOptionPane.QUESTION_MESSAGE);
+//                if ((productIndexText.isEmpty())) {
+//                    JOptionPane.showMessageDialog(null, "Product index cannot be empty!", "Seller Menu - Remove Product",
+//                            JOptionPane.ERROR_MESSAGE);
+//                }
+//            } while ((productIndexText.isEmpty()));
+//
+//            redo = false;
+//            try {
+//                Integer.parseInt(productIndexText);
+//            } catch (NumberFormatException e) {
+//                JOptionPane.showMessageDialog(null, "Please enter a valid product index!",
+//                        "Seller Menu - Remove Product", JOptionPane.ERROR_MESSAGE);
+//                redo = true;
+//            }
+//        } while (redo);
+//        return productIndexText;
+//    }
 
     public static void randomErrorMessageDialog() {
         JOptionPane.showMessageDialog(null, "Error, invalid input!", "Seller Menu",
@@ -298,7 +340,7 @@ public class SellerClient {
     }
 
     public static void thankYouMessageDialog() {
-        JOptionPane.showMessageDialog(null, "Thank you for using the market!",
+        JOptionPane.showMessageDialog(null, "Thank You For Using The Seller Menu!",
                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
     }
 
