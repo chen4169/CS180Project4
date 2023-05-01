@@ -14,6 +14,7 @@ public class SellerClient {
     private static String searchMarketsBySellerId = "13";
     private static String removeProduct = "14";
     private static String addProductBySeller = "15";
+    private static String searchPurchaseHistoryByStoreId = "16";
 
     private final BufferedReader in;
     private final PrintWriter out;
@@ -187,28 +188,30 @@ public class SellerClient {
 
 
                 } else if (sellerChoice.equals("View Sales")) { // checking sales
-                    //lists all the sellers stores, giving a dropdown menu to choose one to view details
-
-
-                    sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
-                            "Select a Store to View Sales",
-                            "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, singleMarket,
-                            singleMarket[0]);
+                     
+                    //select a store to view sales for
+                    String sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
+                            "Select a Store To View Sales",
+                            "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, stores,
+                            stores[0]);
 
                     if (sellerStoreChoice == null) { //CANCELLED
                         break;
                     }
 
-                    storeId = sellerStoreChoice.substring(sellerStoreChoice.indexOf(" " + 1));
-                    String storeName = sellerStoreChoice.substring(0, sellerStoreChoice.indexOf(" "));
-                    String sellerSalesChoice = sellerSalesChoiceInputDialog();
+                    String storeId = sellerStoreChoice.split(",")[0]; //gets the store ID
 
-                    if (sellerSalesChoice.equals("View Sales by Product")) {
-                        //TODO: "Product ID:" (product ID), "Number of Sales:" (number of sales)
-                    } else if (sellerSalesChoice.equals("View Sales by Customer")) {
-                        //TODO: "Customer ID:" (customer ID), "Number of Products Purchased:" (number of products purchased)
+                    out.println(searchPurchaseHistoryByStoreId + storeId); //asks for purchase history
+                    out.flush();
+
+                    String[] products = in.readLine().split("@"); // retrieves purchase history
+
+                    if (!products[0].isEmpty()) { //as long as purchases are not empty
+                        JOptionPane.showMessageDialog(null, products,
+                                "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    } else { //purchases are empty
+                        JOptionPane.showMessageDialog(null, "No Sales Made", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
                     }
-
 
                 } else if (sellerChoice.equals("View Products in Cart")) {
                     // id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice + "," + storeId;
