@@ -9,9 +9,10 @@ import java.util.ArrayList;
  * This is a client class that provides interface for a seller to exchange information with the server.
  */
 public class SellerClient {
-    private static String searchMarketsBySellerId = "13";
     private static String searchProductsByStoreID = "12";
+    private static String searchMarketsBySellerId = "13";
     private static String removeProduct = "14";
+    private static String addProductBySeller = "15";
 
     private final BufferedReader in;
     private final PrintWriter out;
@@ -150,34 +151,40 @@ public class SellerClient {
                     }
 
 
-                    // db.removeProduct(Integer.parseInt(productID)); //TODO: |DATABASE| remove product from the database by input of the product index
-
-
                 } else if (sellerChoice.equals("Add Products")) { // adds product
 
 
-                    //adds stores from the arraylist to an array
-                    for (String store : stores) {
-                        singleMarket = store.split(",");
-                    }
 
                     //gets the store ID from the seller store choice, the store products will be added to
                     sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
                             "Select a Store to Add Products",
-                            "Seller Menu - Add Products", JOptionPane.QUESTION_MESSAGE, null, singleMarket,
-                            singleMarket[0]);
+                            "Seller Menu - Add Products", JOptionPane.QUESTION_MESSAGE, null, stores,
+                            stores[0]);
 
                     if (sellerStoreChoice == null) { //CANCELLED
-                        break;
+                        continue;
                     }
 
-                    storeId = sellerStoreChoice.substring(sellerStoreChoice.indexOf(" " + 1)); //store ID input
+                    storeId = sellerStoreChoice.split(",")[0]; //store ID input
                     String productName = addProductNameInputDialog(); //product name input
                     String productDescription = addProductDescriptionInputDialog(); //product description input
-                    int productQuantity = Integer.parseInt(addProductQuantityInputDialog()); //quantity input is turned into an INT
-                    double productPrice = Double.parseDouble(addProductPriceInputDialog()); //price input is turned into an INT
+                    String productQuantity = addProductQuantityInputDialog(); //quantity input is turned into an INT
+                    String productPrice = addProductPriceInputDialog(); //price input is turned into an INT
 
-                    // String productId = db.getMaxProductId();//TODO: |DATABASE| get a new product ID, +1 from the current highest ID
+                    String product = String.join(",", productName, storeId, productDescription,
+                            productQuantity, productPrice);
+
+                    out.println(addProductBySeller + product);
+                    out.flush();
+
+                    try {
+                        String resp = in.readLine(); //
+                        JOptionPane.showMessageDialog(null, "Product Added!", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException err) {
+                        err.printStackTrace();
+                    }
+
+
 
                     // db.addProductBySeller(productId, productName, storeId, productDescription, productQuantity, productPrice);//TODO: |DATABASE| add product to the database for the seller
 
