@@ -222,16 +222,23 @@ public class SellerClient {
 
                     String[] products = resp.split("@");
                     double revenue = 0;
+                    boolean t = true;
                     for (String product: products) {
                         if (product.contains("KEY: \nproductId,storeId,quantity,buyerId" +
                                 ",price,name,storeName,orderId\n\n")) {
-                            product = product.split("\n\n")[1];
+                            String[] temp = product.split("\n\n");
+                            if (temp.length == 1) {
+                                t = false;
+                                break;
+                            }
+                            product = temp[1];
+
                         }
                         revenue += Integer.parseInt(product.split(",")[2]) *
                                 Double.parseDouble(product.split(",")[4]);
                     }
 
-                    if (!products.equals("KEY: \nproductId,storeId,quantity,buyerId,price,name,storeName,orderId\n\n"))
+                    if (t)
                     { //as long as purchases are not empty
                         JOptionPane.showMessageDialog(null, products,
                                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
@@ -336,6 +343,7 @@ public class SellerClient {
                 }
 
             } catch (Exception e) {
+                e.printStackTrace();
                 randomErrorMessageDialog(); //Any exception that occurs throws an error "Error, invalid input!"
             }
         }
