@@ -1,58 +1,6 @@
 ﻿CS18000 - Problem Solving and Object-Oriented Programming
 
-
-
-
-
-
 Project 5 Report
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Written by: Owen Willis, Tommy Eggers, Libin Chen, Jaime Rueda.
 CS180 - Project 5 Report Part One: The Project and its Functionality
