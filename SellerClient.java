@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -15,6 +16,7 @@ public class SellerClient {
     private static String removeProduct = "14";
     private static String addProductBySeller = "15";
     private static String searchPurchaseHistoryByStoreId = "16";
+    private static String addStore = "17";
 
     private final BufferedReader in;
     private final PrintWriter out;
@@ -188,7 +190,7 @@ public class SellerClient {
 
 
                 } else if (sellerChoice.equals("View Sales")) { // checking sales
-                     
+
                     //select a store to view sales for
                     String sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
                             "Select a Store To View Sales",
@@ -201,14 +203,34 @@ public class SellerClient {
 
                     String storeId = sellerStoreChoice.split(",")[0]; //gets the store ID
 
+                    String resp = "KEY: \nproductId,storeId,quantity,buyerId,price,name,storeName,orderId\n\n";
+
                     out.println(searchPurchaseHistoryByStoreId + storeId); //asks for purchase history
                     out.flush();
+                    try {
+                         resp += in.readLine(); // retrieves purchase history
+                    } catch (IOException err) {
+                        JOptionPane.showMessageDialog(null, "Error Retrieving Sales",
+                                "Seller Menu", JOptionPane.ERROR_MESSAGE);
+                    }
 
-                    String[] products = in.readLine().split("@"); // retrieves purchase history
+                    String[] products = resp.split("@");
+                    double revenue = 0;
+                    for (String product: products) {
+                        if (product.contains("KEY: \nproductId,storeId,quantity,buyerId" +
+                                ",price,name,storeName,orderId\n\n")) {
+                            product = product.split("\n\n")[1];
+                        }
+                        revenue += Integer.parseInt(product.split(",")[2]) *
+                                Double.parseDouble(product.split(",")[4]);
+                    }
 
-                    if (!products[0].isEmpty()) { //as long as purchases are not empty
+                    if (!products.equals("KEY: \nproductId,storeId,quantity,buyerId,price,name,storeName,orderId\n\n")) { //as long as purchases are not empty
                         JOptionPane.showMessageDialog(null, products,
                                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null,
+                                String.format("Store's Revenue: $%.2f",revenue),
+                                "Seller Menu - Revenue", JOptionPane.INFORMATION_MESSAGE);
                     } else { //purchases are empty
                         JOptionPane.showMessageDialog(null, "No Sales Made", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -249,14 +271,57 @@ public class SellerClient {
 
 
                 } else if (sellerChoice.equals("Add Store")) {
-                    
 
-                    //TODO: add a store
+                    String storeName = addStoreNameInputDialog();
+
+                    out.println(addStore + storeName + "," + id);
+                    out.flush();
+
+                    try {
+                        String resp = in.readLine();
+                        JOptionPane.showMessageDialog(null, "Store Added!", "Seller Menu",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException err) {
+                        err.printStackTrace();
+                    }
+
+                } else if (sellerChoice.equals("Import Products")) { // Quits loop of program
+                    String filePath = JOptionPane.showInputDialog(null,
+                            "Enter FilePath for Import File", "Seller Menu", JOptionPane.QUESTION_MESSAGE);
+
+                    try (BufferedReader bfr = new BufferedReader(new FileReader(filePath))) {
+                        // Getting info from the products
+                        String prodString = "";
+                        String s;
+                        while (true) {
+                            s = bfr.readLine();
+                            if (s == null) {
+                                break;
+                            }
+                            prodString += s + "@";
+                        }
+
+                        // Adding Products to Store
+                        String[] products = prodString.split("@");
+
+                        for (String product: products) {
+                            out.println(addProductBySeller + product);
+                            out.flush();
+
+                            try {
+                                in.readLine();
+                            } catch (IOException err) {
+                                JOptionPane.showMessageDialog(null, "Error Adding " + product,
+                                        "Seller Menu", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
 
 
-                } else if (sellerChoice.equals("Quit")) { // Quits loop of program
 
-                    thankYouMessageDialog(); //goodbye message window "Thank you for using the seller menu!"
+                    } catch (IOException err) {
+                        JOptionPane.showMessageDialog(null, "No File Found with Specified Path",
+                                "Seller Menu", JOptionPane.QUESTION_MESSAGE);
+                    }
 
                 }
 
@@ -264,7 +329,8 @@ public class SellerClient {
                 randomErrorMessageDialog(); //Any exception that occurs throws an error "Error, invalid input!"
             }
         }
-        return true;
+        thankYouMessageDialog(); //goodbye message window "Thank you for using the seller menu!"
+        return false;
     }
 
     //--------------------------------------    GUI METHODS   ------------------------------------------------------
@@ -364,8 +430,8 @@ public class SellerClient {
     }
 
 
-    private static final String[] sellerOptions = {"", "View Products", "Remove Products", "Add Products",
-            "View Sales", "View Products in Cart", "Add Store", "Quit"};
+    private static final String[] sellerOptions = {"View Products", "Remove Products", "Add Products",
+            "View Sales", "View Products in Cart", "Add Store", "Import Products"};
 
     public static String sellerChoiceInputDialog() {
         String sellerChoice;
@@ -399,6 +465,21 @@ public class SellerClient {
     public static void thankYouMessageDialog() {
         JOptionPane.showMessageDialog(null, "Thank You For Using The Seller Menu!",
                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static String addStoreNameInputDialog() {
+        String storeName;
+        do {
+            storeName = JOptionPane.showInputDialog(null, "Enter Store Name:",
+                    "Seller Menu - Add Store", JOptionPane.QUESTION_MESSAGE);
+            if ((storeName.isEmpty())) {
+                JOptionPane.showMessageDialog(null, "Store name cannot be empty!",
+                        "Seller Menu - Add Store",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } while ((storeName.isEmpty()));
+
+        return storeName;
     }
 
 }
