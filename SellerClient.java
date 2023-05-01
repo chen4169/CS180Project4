@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * This is a seller class that provides the interface for a seller to exchange information with the server.
- * @Version 2023/4/30 1.2
+ * @Version 2023/4/30 1.3
  * @author Thomas Eggers, Owen Willis
  */
 
@@ -95,7 +95,7 @@ public class SellerClient {
                     break;
                 } if (sellerChoice.equals("View Products")) { // seller chooses to view products
 
-                    //dropdown menu JOptionPane that gives the choice in the format of (store name), Store ID: (store ID)
+                    //dropdown menu JOptionPane that gives the choice in the format of (store name), Store ID:(store ID)
                     String sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
                             "Select a Store To View",
                             "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, stores,
@@ -118,7 +118,8 @@ public class SellerClient {
                         JOptionPane.showMessageDialog(null, products,
                                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, "No Products", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "No Products", "Seller Menu",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 } else if (sellerChoice.equals("Remove Products")) { // remove products option
@@ -152,7 +153,8 @@ public class SellerClient {
 
                     try {
                         String resp = in.readLine();
-                        JOptionPane.showMessageDialog(null, "Product Removed", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Product Removed",
+                                "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
                     } catch (IOException err) {
                         err.printStackTrace();
                     }
@@ -186,7 +188,8 @@ public class SellerClient {
 
                     try {
                         String resp = in.readLine(); //
-                        JOptionPane.showMessageDialog(null, "Product Added!", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Product Added!", "Seller Menu"
+                                , JOptionPane.INFORMATION_MESSAGE);
                     } catch (IOException err) {
                         err.printStackTrace();
                     }
@@ -228,18 +231,21 @@ public class SellerClient {
                                 Double.parseDouble(product.split(",")[4]);
                     }
 
-                    if (!products.equals("KEY: \nproductId,storeId,quantity,buyerId,price,name,storeName,orderId\n\n")) { //as long as purchases are not empty
+                    if (!products.equals("KEY: \nproductId,storeId,quantity,buyerId,price,name,storeName,orderId\n\n"))
+                    { //as long as purchases are not empty
                         JOptionPane.showMessageDialog(null, products,
                                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
                         JOptionPane.showMessageDialog(null,
                                 String.format("Store's Revenue: $%.2f",revenue),
                                 "Seller Menu - Revenue", JOptionPane.INFORMATION_MESSAGE);
                     } else { //purchases are empty
-                        JOptionPane.showMessageDialog(null, "No Sales Made", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "No Sales Made", "Seller Menu",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 } else if (sellerChoice.equals("View Products in Cart")) {
-                    // id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice + "," + storeId;
+                    // id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," +
+                    // productPrice + "," + storeId;
 
                     //gets the store ID from the seller store choice, the store products will be added to
                     sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
@@ -263,7 +269,8 @@ public class SellerClient {
                         err.printStackTrace();
                     }
 
-                    if (resp.equals("KEY: \nid,productId,productName,buyerId,productQuantity,productPrice,storeId\n\n")) {
+                    if (resp.equals("KEY: \nid,productId,productName,buyerId,productQuantity,productPrice,storeId\n\n"))
+                    {
                         JOptionPane.showMessageDialog(null, "No Items in Customers' Carts",
                                 "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -357,7 +364,8 @@ public class SellerClient {
         String productDescriptionText;
         do {
             productDescriptionText = JOptionPane.showInputDialog(null,
-                    "Enter product description:", "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
+                    "Enter product description:", "Seller Menu - Add Product",
+                    JOptionPane.QUESTION_MESSAGE);
             if ((productDescriptionText.isEmpty())) {
                 JOptionPane.showMessageDialog(null, "Product description cannot be empty!",
                         "Seller Menu - Add Product",
@@ -374,7 +382,8 @@ public class SellerClient {
         do {
             do {
                 productQuantityText = JOptionPane.showInputDialog(null,
-                        "Enter product quantity:", "Seller Menu - Add Product", JOptionPane.QUESTION_MESSAGE);
+                        "Enter product quantity:", "Seller Menu - Add Product",
+                        JOptionPane.QUESTION_MESSAGE);
                 if ((productQuantityText.isEmpty())) {
                     JOptionPane.showMessageDialog(null, "Product Quantity cannot be empty!",
                             "Seller Menu - Add Product",
