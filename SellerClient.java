@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class SellerClient {
     private static String searchMarketsBySellerId = "13";
     private static String searchProductsByStoreID = "12";
+    private static String removeProduct = "14";
 
     private final BufferedReader in;
     private final PrintWriter out;
@@ -93,12 +94,11 @@ public class SellerClient {
                             stores[0]);
 
                     if (sellerStoreChoice == null) { //CANCELLED
-                        break;
+                        continue;
                     }
 
 
                     String storeId = sellerStoreChoice.split(",")[0]; //gets the store ID
-                    String chosenStore = sellerStoreChoice.split(",")[0]; //gets the store name
 
 
                     // Getting products associated with stores
@@ -106,32 +106,49 @@ public class SellerClient {
 
                     String[] products = in.readLine().split("@");
 
-                    JOptionPane.showMessageDialog(null, products,
-                            "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
-
+                    if (!products[0].isEmpty()) {
+                        JOptionPane.showMessageDialog(null, products,
+                                "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No Products", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    }
 
                 } else if (sellerChoice.equals("Remove Products")) { // remove products option
 
+                    String sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
+                            "Select a Store To View",
+                            "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, stores,
+                            stores[0]);
 
-                    // sellerProductsWithID =;//TODO: |DATABASE| get an arraylist of products pertaining to a specific store ID. Format: "(product name) - Product ID: (product ID)"  *formatted exactly*
 
-                    sellerProducts = new String[sellerProductsWithID.size()]; //arraylist of products determines size of array
+                    String storeId = sellerStoreChoice.split(",")[0]; //gets the store ID
 
-                    for (String line : sellerProductsWithID) { //products + ID are assigned to array by splitting the commas
-                        sellerProducts = line.split(",");
-                    }
+                    // Getting products associated with stores
+                    out.println(searchProductsByStoreID + storeId);
+
+                    String[] products = in.readLine().split("@");
 
                     //drop down menu of what product the seller wants to remove
                     String sellerProductRemoval = (String) JOptionPane.showInputDialog(null,
                             "Select a Product to Remove",
-                            "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, sellerProducts,
-                            sellerProducts[0]);
+                            "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, products,
+                            products[0]);
 
                     if (sellerProductRemoval == null) { //CANCELLED
                         break;
                     }
 
-                    String productID = sellerProductRemoval.substring(sellerProductRemoval.indexOf(" " + 1)); //gets the product ID from the seller product choice
+                    String productID = sellerProductRemoval.split(",")[0];
+                    out.println(removeProduct + productID);
+                    out.flush();
+
+                    try {
+                        String resp = in.readLine();
+                        JOptionPane.showMessageDialog(null, "Product Removed", "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException err) {
+                        err.printStackTrace();
+                    }
+
 
                     // db.removeProduct(Integer.parseInt(productID)); //TODO: |DATABASE| remove product from the database by input of the product index
 
