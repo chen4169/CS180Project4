@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * This is a seller class that provides the interface for a seller to exchange information with the server.
- * @Version 2023/4/30 1.3
+ * @Version 2023/4/30 1.2
  * @author Thomas Eggers, Owen Willis
  */
 
@@ -93,7 +93,7 @@ public class SellerClient {
 
                 if (sellerChoice == null) {  // EXITING OPERATION
                     break;
-                } if (sellerChoice.equals("View Products")) { // seller chooses to view products
+                } else if (sellerChoice.equals("View Products")) { // seller chooses to view products
 
                     //dropdown menu JOptionPane that gives the choice in the format of (store name), Store ID:(store ID)
                     String sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
@@ -249,8 +249,8 @@ public class SellerClient {
 
                     //gets the store ID from the seller store choice, the store products will be added to
                     sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
-                            "Select a Store to Add Products",
-                            "Seller Menu - Add Products", JOptionPane.QUESTION_MESSAGE, null, stores,
+                            "Select a Store to View Products From",
+                            "Seller Menu", JOptionPane.QUESTION_MESSAGE, null, stores,
                             stores[0]);
 
                     if (sellerStoreChoice == null) { //CANCELLED
