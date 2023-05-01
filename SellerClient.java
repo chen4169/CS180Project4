@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * This is a client class that provides interface for a seller to exchange information with the server.
  */
 public class SellerClient {
+    private static String searchCartByStoreID = "10";
     private static String searchProductsByStoreID = "12";
     private static String searchMarketsBySellerId = "13";
     private static String removeProduct = "14";
@@ -165,7 +166,7 @@ public class SellerClient {
                         continue;
                     }
 
-                    storeId = sellerStoreChoice.split(",")[0]; //store ID input
+                    storeId = sellerStoreChoice.split(",")[0]; // getting store ID form chosen store
                     String productName = addProductNameInputDialog(); //product name input
                     String productDescription = addProductDescriptionInputDialog(); //product description input
                     String productQuantity = addProductQuantityInputDialog(); //quantity input is turned into an INT
@@ -183,10 +184,6 @@ public class SellerClient {
                     } catch (IOException err) {
                         err.printStackTrace();
                     }
-
-
-
-                    // db.addProductBySeller(productId, productName, storeId, productDescription, productQuantity, productPrice);//TODO: |DATABASE| add product to the database for the seller
 
 
                 } else if (sellerChoice.equals("View Sales")) { // checking sales
@@ -214,13 +211,42 @@ public class SellerClient {
 
 
                 } else if (sellerChoice.equals("View Products in Cart")) {
+                    // id + "," + productId + "," + productName + "," + buyerId + "," + productQuantity + "," + productPrice + "," + storeId;
 
+                    //gets the store ID from the seller store choice, the store products will be added to
+                    sellerStoreChoice = (String) JOptionPane.showInputDialog(null,
+                            "Select a Store to Add Products",
+                            "Seller Menu - Add Products", JOptionPane.QUESTION_MESSAGE, null, stores,
+                            stores[0]);
 
-                    //TODO: view products in all customer carts
+                    if (sellerStoreChoice == null) { //CANCELLED
+                        continue;
+                    }
+                    storeId = sellerStoreChoice.split(",")[0]; //store ID input
+
+                    out.println(searchCartByStoreID + storeId);
+                    out.flush();
+
+                    String resp = "KEY: \nid,productId,productName,buyerId,productQuantity,productPrice,storeId\n\n";
+
+                    try {
+                        resp += in.readLine();
+                    } catch (IOException err) {
+                        err.printStackTrace();
+                    }
+
+                    if (resp.equals("KEY: \nid,productId,productName,buyerId,productQuantity,productPrice,storeId\n\n")) {
+                        JOptionPane.showMessageDialog(null, "No Items in Customers' Carts",
+                                "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        String[] cartStuff = resp.split("@");
+                        JOptionPane.showMessageDialog(null, cartStuff,
+                                "Seller Menu", JOptionPane.INFORMATION_MESSAGE);
+                    }
 
 
                 } else if (sellerChoice.equals("Add Store")) {
-
+                    
 
                     //TODO: add a store
 
